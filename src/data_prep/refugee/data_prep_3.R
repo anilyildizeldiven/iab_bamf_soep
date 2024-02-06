@@ -63,8 +63,6 @@ biol_variables <- c("pid", "hid", "syear",
 biol_subset <- biol[ , biol_variables]
 
 
-
-
 ## pl -----------
 # Relevant questions:
 # plj0666 - Asylum application year
@@ -90,6 +88,12 @@ pl_subset <- pl_subset_ref[,pl_variables]
 data_prep_3 <- data_prep_2 %>%
   left_join(pl_subset, by = c("pid", "hid", "syear")) %>%
   left_join(biol_subset, by = c("pid", "hid", "syear"))
+
+# Save data ------
+
+# data_prep_3
+save(data_prep_3, file = paste0(path_out,"data_prep_3.RData"))
+
 
 
 
