@@ -1,4 +1,5 @@
 ############################## 2 - Prepare Data ####################################
+# Refugees and Employment
 # Input data set: data_prep_1, pl_subset_ref, biol
 # Output data set: data_prep_1
 # Aim: Merge employment outcome of interest
@@ -12,7 +13,7 @@ library(haven)
 path_data_soep <- "C:/Users/ru23kek/Desktop/projects/data/soepdata/"
 path_data_processed <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep/soepdata/processed/"
 path_data_processed_ref <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep/soepdata/processed/refugee/"
-path_out <- ""
+path_out <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep/soepdata/processed/refugee/"
 
 # Load data ------------
 
@@ -85,14 +86,6 @@ pl_subset <- pl_subset_ref[,pl_variables]
 
 
 # Merge data ------
-
-# Input: biol_subset and pl_subset
-# Output: biol_pl
-
-biol_pl <- pl_subset %>%
-  left_join(biol_subset, by = c("pid", "hid", "syear"))
-
-
 # input: data_prep_1, biol_subset, pl_subset
 # output: data_prep_2
 # Rows: 88.074
@@ -104,6 +97,10 @@ data_prep_2 <- data_prep_1 %>%
 
 
 
+# Save data ------
+
+# data_prep_2
+save(data_prep_2, file = paste0(path_out,"data_prep_2.RData"))
 
 
 

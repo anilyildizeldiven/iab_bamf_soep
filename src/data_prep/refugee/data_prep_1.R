@@ -1,4 +1,5 @@
 ############################## 1 - Prepare Data ####################################
+# Refugees and Location
 # Input data set: ppathl_subset_ref, hbrutto
 # Output data set: data_prep_1
 # Aim: Merge location data from hbrutto to ppathl_subset_ref data 
