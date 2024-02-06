@@ -13,7 +13,7 @@ library(RColorBrewer)
 
 # Define paths -------
 path_data_soep <- "C:/Users/ru23kek/Desktop/projects/data/soepdata/"
-path_data_processed <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep_project/soepdata/processed/refugee/"
+path_data_processed <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep/soepdata/processed/refugee/"
 path_out <- ""
 
 
@@ -66,6 +66,48 @@ data <- data  %>%
 
 
 # EDA --------
+
+
+
+## Personal IDs and Households ------
+
+# Do the Personal IDs change Households over the years
+
+# Sort the data frame by pid and syear
+data <- data %>% arrange(pid, syear)
+
+# Create a new column to check if bula_h changes each year for each pid
+data <- data %>%
+  group_by(pid) %>%
+  mutate(bula_h_changed = ifelse(bula_h != lag(bula_h), TRUE, FALSE))
+
+# Select only the rows where bula_h changes
+pid_with_changed_bula_h <- data %>%
+  filter(bula_h_changed) %>%
+  distinct()
+
+# Result: for 652 pids, the federal state changes across the years
+# Idea: Remove in case long term-employment has to be measured?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 ## 2016 ------

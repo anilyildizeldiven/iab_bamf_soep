@@ -2,6 +2,7 @@
 # Input data set: ppathl_subset_ref, hbrutto
 # Output data set: data_prep_1
 # Aim: Merge location data from hbrutto to ppathl_subset_ref data 
+# 
 
 # Load packages ------
 library(dplyr)
@@ -9,7 +10,8 @@ library(haven)
 
 # Define paths -------
 path_data_soep <- "C:/Users/ru23kek/Desktop/projects/data/soepdata/"
-path_data_processed <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep_project/soepdata/processed/"
+path_data_soep_raw <- "C:/Users/ru23kek/Desktop/projects/data/soepdata/raw/"
+path_data_processed <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep/soepdata/processed/"
 path_out <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep_project/soepdata/processed/refugee/"
 
 
@@ -25,6 +27,14 @@ load(paste0(path_data_processed, "ppathl_subset_ref.RData"))
 # Rows: 501.622
 # Columns: 102
 hbrutto <- read_dta(paste0(path_data_soep, "hbrutto.dta"))
+
+
+## bioresidrefinG -----
+# Remarks: starting out of 2019
+# Rows:
+# Columns:
+bioresidrefinG <- read_dta(paste0(path_data_soep_raw, "bioresidrefinG.dta"))
+
 
 
 # Keep relevant columns -------
@@ -53,6 +63,11 @@ hbrutto_variables <- c("hid", "syear", "bula_h", "bula_v1", "bula_v2",
 
 
 hbrutto_subset <- hbrutto[,hbrutto_variables]
+
+## hl -----
+#
+#
+
 
 
 # Merge data ------
