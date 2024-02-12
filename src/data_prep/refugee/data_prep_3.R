@@ -1,5 +1,5 @@
 ############################## 3 - Prepare Data ####################################
-# Refugees and socio-demographic characteristcs (thereof: free-case)
+# Refugees and 
 # Input data set: data_prep_2
 # Output data set: data_prep_3
 # Aim: merge free-case no/yes and further data
@@ -54,7 +54,7 @@ biol <- read_dta(paste0(path_data_soep, "biol.dta"))
 # lb0228 - Vocational Training Outside Germany
 
 biol_variables <- c("pid", "hid", "syear",
-                    "lr3235", "lr2076", "lm0128i01",
+                    "lr2076", "lm0128i01", "lm0128i02", "lm0128i03",
                     "lr3079", "lr3077_v1", "lb0191",
                     "lr3132", "lr3133",
                     "lb1246", "lb1247_v1", "lb1247_v2", "lb1248",
@@ -67,7 +67,7 @@ biol_subset <- biol[ , biol_variables]
 # Relevant questions:
 # plj0666 - Asylum application year
 # plj0680_v2 - Current residence permit
-# plh0258_v9 - Religious affilitation
+# plh0258_v9 - Religious affiliation
 # plm0558 - Frequency praying
 # plj0626 - Marital status
 
