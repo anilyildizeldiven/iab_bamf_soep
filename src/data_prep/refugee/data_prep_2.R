@@ -1,9 +1,9 @@
 ############################## 2 - Prepare Data ####################################
 # Refugees and Employment
 # Input data set: data_prep_1, pl_subset_ref, biol
-# Output data set: data_prep_1
+# Output data set: data_prep_2
 # Aim: Merge employment outcome of interest
-# 
+
 
 # Load packages ------
 library(dplyr)
@@ -11,6 +11,7 @@ library(haven)
 
 # Define paths -------
 path_data_soep <- "C:/Users/ru23kek/Desktop/projects/data/soepdata/"
+path_data_soep_raw <- "C:/Users/ru23kek/Desktop/projects/data/soepdata/raw/"
 path_data_processed <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep/soepdata/processed/"
 path_data_processed_ref <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep/soepdata/processed/refugee/"
 path_out <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep/soepdata/processed/refugee/"
@@ -19,7 +20,7 @@ path_out <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep/soepdata/processed/
 
 ## data_prep_1 -----
 # Rows: 88.074
-# Columns: 27
+# Columns: 23
 load(paste0(path_data_processed_ref, "data_prep_1.RData"))
 
 ## pl_subset_ref ------
@@ -39,7 +40,6 @@ biol <- read_dta(paste0(path_data_soep, "biol.dta"))
 # Rows: 130.429
 # Columns: 6
 # Relevant questions:
-# 1)
 # lr2110 - Have you ever been employed in Germany?
 # Answer options:
 # 1 - yes
@@ -47,7 +47,6 @@ biol <- read_dta(paste0(path_data_soep, "biol.dta"))
 # -2 - does not apply
 # -5 - not included in version
 # -8 - question not included in the year
-# 2)
 # lr2098 - In which year were you in your first job in Germany?
 # Answer options:
 # Year
@@ -79,7 +78,7 @@ biol_subset <- biol[ , biol_variables]
 # -1 - not known
 
 pl_variables <- c("pid", "hid", "syear",
-                  "plb0022_h", "plb0022_v9", "plb0022_v11")
+                  "plb0022_h")
 
 
 pl_subset <- pl_subset_ref[,pl_variables]

@@ -1,9 +1,9 @@
 ############################## 1 - Prepare Data ####################################
 # Refugees and Location
-# Input data set: ppathl_subset_ref, hbrutto
+# Input data set: ppathl_subset_ref, hbrutto, biol, regionl, bioregionl
 # Output data set: data_prep_1
-# Aim: Merge location data from hbrutto to ppathl_subset_ref data 
-# 
+# Aim: Merge location data (federal state information to hid and pid)
+
 
 # Load packages ------
 library(dplyr)
@@ -13,7 +13,7 @@ library(haven)
 path_data_soep <- "C:/Users/ru23kek/Desktop/projects/data/soepdata/"
 path_data_soep_raw <- "C:/Users/ru23kek/Desktop/projects/data/soepdata/raw/"
 path_data_processed <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep/soepdata/processed/"
-path_out <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep_project/soepdata/processed/refugee/"
+path_out <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep/soepdata/processed/refugee/"
 
 
 # Load data ------------
@@ -30,11 +30,21 @@ load(paste0(path_data_processed, "ppathl_subset_ref.RData"))
 hbrutto <- read_dta(paste0(path_data_soep, "hbrutto.dta"))
 
 
-## bioresidrefinG -----
-# Remarks: starting out of 2019
-# Rows:
-# Columns:
-bioresidrefinG <- read_dta(paste0(path_data_soep_raw, "bioresidrefinG.dta"))
+## biol -------
+# Rows: 130.429
+# Columns: 3579
+biol <- read_dta(paste0(path_data_soep, "biol.dta"))
+
+
+## regionl -----
+# Rows: 652.238
+# Columns: 36
+regionl <- read_dta(paste0(path_data_soep, "regionl.dta"))
+
+## bioregion ----
+# Rows: 68.489
+# Columns: 94
+bioregion <- read_dta(paste0(path_data_soep_raw, "bioregion.dta"))
 
 
 
@@ -58,17 +68,41 @@ ppathl_subset_ref <- ppathl_subset_ref[,ppathl_variables]
 # Keep only variables of interest
 # Rows: 501.622
 # Columns:  11
-hbrutto_variables <- c("hid", "syear", "bula_h", "bula_v1", "bula_v2", 
-                       "wein_v1", "wein_v2", "wein_v3",
-                       "hader_v1", "hader_v2", "hadq")
+hbrutto_variables <- c("hid", "syear", "bula_h")
 
 
 hbrutto_subset <- hbrutto[,hbrutto_variables]
 
-## hl -----
-#
-#
+## biol -----
+# Keep only variables of interest
+biol_variables <- c("pid","hid", "syear",
+                    "lr3367_h", "lr3235")
 
+biol_subset <- biol[, biol_variables]
+
+## regionl ----
+# Keep only variables of interest
+regionl_variables <- c("hid", "syear", "bula")
+
+regionl_subset <- regionl[, regionl_variables]
+
+
+## bioregion -----
+# Keep only variable of interest
+bioregion_variables <- c("pid", "syear", "place_type")
+
+bioregion_subset <- bioregion[, bioregion_variables]
+
+# Check duplicates
+# Duplicates: 23914
+duplicates <- bioregion_subset %>%
+  group_by(pid,syear) %>%
+  filter(n()>1)
+
+# Remove duplicates
+# Rows: 44.675
+bioregion_subset <- bioregion_subset %>%
+  anti_join(duplicates, by = c("pid", "syear"))
 
 
 # Merge data ------
@@ -78,16 +112,16 @@ hbrutto_subset <- hbrutto[,hbrutto_variables]
 # Columns: 27
 
 data_prep_1 <- ppathl_subset_ref %>%
-  left_join(hbrutto_subset, by = c("hid", "syear"))
+  left_join(hbrutto_subset, by = c("hid", "syear")) %>%
+  left_join(biol_subset, by = c("pid", "hid", "syear")) %>%
+  left_join(regionl_subset,  by = c("hid", "syear")) %>%
+  left_join(bioregion_subset, by = c( "pid", "syear"))
 
 
 # Save data ------
 
 # data_prep_1
 save(data_prep_1, file = paste0(path_out,"data_prep_1.RData"))
-
-
-
 
 
 
