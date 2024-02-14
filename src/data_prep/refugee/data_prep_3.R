@@ -1,5 +1,5 @@
 ############################## 3 - Prepare Data ####################################
-# Refugees and 
+# Refugees and Socio-Demographic Characteristics
 # Input data set: data_prep_2
 # Output data set: data_prep_3
 # Aim: merge free-case no/yes and further data
@@ -40,7 +40,6 @@ biol <- read_dta(paste0(path_data_soep, "biol.dta"))
 
 ## biol ------
 # Relevant questions:
-# lr3235 - Number of locations
 # lr2076 - Mother tongue
 # lm0128i01 - German before arrival (Zuzug)
 # lr3079 - School Certificate Abroad
@@ -51,14 +50,15 @@ biol <- read_dta(paste0(path_data_soep, "biol.dta"))
 # lb1246 - Help relatives
 # lb1247_v1 and lb1247_v2 - Help friends
 # lb1248 - Help no one
+# lr3168 - Familiy there
 # lb0228 - Vocational Training Outside Germany
 
 biol_variables <- c("pid", "hid", "syear",
-                    "lr2076", "lm0128i01", "lm0128i02", "lm0128i03",
-                    "lr3079", "lr3077_v1", "lb0191",
-                    "lr3132", "lr3133",
-                    "lb1246", "lb1247_v1", "lb1247_v2", "lb1248",
-                    "lb0228")
+                    "lr2076", "lm0128i01", "lm0128i02", 
+                    "lm0128i03", "lr3079", "lr3077_v1", 
+                    "lb0191","lr3132", "lr3133", "lr3168",
+                    "lb1246", "lb1247_v1", "lb1247_v2",
+                    "lb1248", "lb0228")
 
 biol_subset <- biol[ , biol_variables]
 
@@ -74,7 +74,7 @@ biol_subset <- biol[ , biol_variables]
 
 pl_variables <- c("pid", "hid", "syear",
                   "plj0666", "plj0680_v2", "plh0258_v9",
-                  "plm0558", "plj0626")
+                  "plj0626")
 
 
 pl_subset <- pl_subset_ref[,pl_variables]

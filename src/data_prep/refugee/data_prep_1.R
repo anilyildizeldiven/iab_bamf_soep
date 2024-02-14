@@ -64,15 +64,6 @@ ppathl_variables <- c("pid", "hid", "parid",
 
 ppathl_subset_ref <- ppathl_subset_ref[,ppathl_variables]
 
-## hbrutto ------
-# Keep only variables of interest
-# Rows: 501.622
-# Columns:  11
-hbrutto_variables <- c("hid", "syear", "bula_h")
-
-
-hbrutto_subset <- hbrutto[,hbrutto_variables]
-
 ## biol -----
 # Keep only variables of interest
 biol_variables <- c("pid","hid", "syear",
@@ -112,7 +103,6 @@ bioregion_subset <- bioregion_subset %>%
 # Columns: 27
 
 data_prep_1 <- ppathl_subset_ref %>%
-  left_join(hbrutto_subset, by = c("hid", "syear")) %>%
   left_join(biol_subset, by = c("pid", "hid", "syear")) %>%
   left_join(regionl_subset,  by = c("hid", "syear")) %>%
   left_join(bioregion_subset, by = c( "pid", "syear"))

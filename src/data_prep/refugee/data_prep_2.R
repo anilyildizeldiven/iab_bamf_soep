@@ -31,7 +31,7 @@ load(paste0(path_data_processed, "pl_subset_ref.RData"))
 ## biol -------
 # Rows: 130.429
 # Columns: 3579
-biol <- read_dta(paste0(path_data_soep, "biol.dta"))
+#biol <- read_dta(paste0(path_data_soep, "biol.dta"))
 
 
 # Keep relevant columns -------
@@ -53,10 +53,10 @@ biol <- read_dta(paste0(path_data_soep, "biol.dta"))
 # -5 / -8 - not included in the version
 
 
-biol_variables <- c("pid", "hid", "syear",
-                    "lr2110", "lr2098", "lr2099")
+#biol_variables <- c("pid", "hid", "syear",
+                    #"lr2110", "lr2098", "lr2099")
 
-biol_subset <- biol[ , biol_variables]
+#biol_subset <- biol[ , biol_variables]
 
 
 
@@ -91,8 +91,8 @@ pl_subset <- pl_subset_ref[,pl_variables]
 # Columns: 33
 
 data_prep_2 <- data_prep_1 %>%
-  left_join(pl_subset, by = c("pid", "hid", "syear")) %>%
-  left_join(biol_subset, by = c("pid", "hid", "syear"))
+  left_join(pl_subset, by = c("pid", "hid", "syear")) #%>%
+ # left_join(biol_subset, by = c("pid", "hid", "syear"))
 
 
 
