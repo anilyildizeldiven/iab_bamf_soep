@@ -66,13 +66,17 @@ ppathl_subset_ref <- ppathl_subset_ref[,ppathl_variables]
 
 ## biol -----
 # Keep only variables of interest
+# lr2074_h: First residence in Germany (2016-2018)
+# lr3367_h: First residence in Germany (2019-2021)
+# lr3235: Number of accomodations in Germany
 biol_variables <- c("pid","hid", "syear",
-                    "lr3367_h", "lr3235")
+                    "lr2074_h", "lr3367_h", "lr3235")
 
 biol_subset <- biol[, biol_variables]
 
 ## regionl ----
 # Keep only variables of interest
+# bula: Federal state of the household in the year of survey
 regionl_variables <- c("hid", "syear", "bula")
 
 regionl_subset <- regionl[, regionl_variables]
@@ -80,7 +84,10 @@ regionl_subset <- regionl[, regionl_variables]
 
 ## bioregion -----
 # Keep only variable of interest
-bioregion_variables <- c("pid", "syear", "place_type")
+# place_bula: Federal state location of the person
+# place_type: Type of location
+bioregion_variables <- c("pid", "syear", "place_bula",
+                         "place_type")
 
 bioregion_subset <- bioregion[, bioregion_variables]
 

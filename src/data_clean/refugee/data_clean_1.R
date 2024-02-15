@@ -15,7 +15,7 @@ library(RColorBrewer)
 # Define paths -------
 path_data_soep <- "C:/Users/ru23kek/Desktop/projects/data/soepdata/"
 path_data_processed <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep/soepdata/processed/refugee/"
-path_out <- ""
+path_out <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep/soepdata/final/"
 
 
 # Load data ------------
@@ -43,11 +43,29 @@ data <- data %>%
   mutate(bula_res = ifelse(lr3367_h >= 1, lr3367_h, NA_real_ )) %>%
   fill(bula_res, .direction = "downup") 
 
-# bula_res == bula if is.na(bula_res) & lr3235 %in% c(1, 2)
+
+# bula_res == lr2074_h if lr2074_h >= 1 or
 data <- data %>%
   group_by(pid) %>%
-  mutate(bula_res = ifelse(is.na(bula_res) & lr3235 %in% c(1, 2), bula, bula_res))
+  mutate(bula_res = ifelse(is.na(bula_res) & lr2074_h >= 1, lr2074_h, bula_res)) %>%
+  fill(bula_res, .direction = "downup") 
 
+# bula_res == place_bula if place_bula >= 1 or
+data <- data %>%
+  group_by(pid) %>%
+  mutate(bula_res = ifelse(is.na(bula_res) & place_bula >= 1, place_bula, bula_res)) %>%
+  fill(bula_res, .direction = "downup") 
+
+
+# bula_res == bula if is.na(bula_res) & lr3235 %in% c(1)
+data <- data %>%
+  group_by(pid) %>%
+  mutate(bula_res = ifelse(is.na(bula_res) & lr3235 %in% c(1), bula, bula_res))  %>%
+  fill(bula_res, .direction = "downup") 
+
+
+data_test <- data %>%
+  select(c("pid","syear", "erstbefr", "bula_res", "bula", "lr3367_h", "lr2074_h", "lr3235", "place_bula", "place_type"))
 
 # Subset Data -------
 
@@ -75,39 +93,32 @@ data <- data  %>%
 data <- data  %>%
   subset(arefback == 2)
 
-# Keep only if federal state is not missing (Remark: the same for bula)
-# bula != -2
-# Rows: 47.394
-data <- data  %>%
-  subset(bula != -2)
-
 # Keep only if first interview and last interview information not missing
-# Rows: 40.875
+# Rows: 41.118
 data <- data  %>%
   subset(erstbefr != -2 & letztbef != -2)
 
 # Keep only if corigin known
 # corigin != -1
-# Rows: 40.866
+# Rows: 41.109
 data <- data  %>%
   subset(corigin != -1)
 
 # Keep only those that immigrated 2 years before first survey
 # erstbefr - immiyear <= 2
-# Rows: 31.011
+# Rows: 31.225
 data <- data  %>%
   subset(erstbefr - immiyear <= 2)
 
 # Keep only if federal state residence not missing
 # !is.na(bula_res)
-# Rows: 19.564
+# Rows: 29.628
 data <- data  %>%
   subset(!is.na(bula_res))
 
 # Keep only the first survey year of each person ID
 # syear == erstbefr
-# Rows: 5292
-
+# Rows: 6573
 data <- data  %>%
   group_by(pid) %>%
   filter(syear == erstbefr)
@@ -185,46 +196,51 @@ data <- data %>%
 
 # Factors 
 data <- data %>%
-  mutate(employment = factor(employment, levels = c(-1, 1, 2, 3, 4, 5, 7, 9, 10),
-                            labels = c(NA_real_, "yes", "yes", "yes", "yes", "yes", "yes", "no", "yes")),
+  mutate(employment = factor(employment, levels = c(9, 1, 2, 3, 4, 5, 7, 10),
+                            labels = c("no", "yes", "yes", "yes", "yes", "yes", "yes", "yes")),
          sex = factor(sex, levels = c(1,2), labels = c("male", "female")),
          partner = factor(partner, levels = c(0, 1, 2, 3, 4, 5),
                           labels = c("no", "married", "cohabitation", "prob_married", "prob_cohabitation", "not_clear")),
-         first_res = ifelse(first_res == -8, NA_real_, first_res),
-         number_res = ifelse(number_res %in% c(-8, -5,-1), NA_real_, number_res),
-         year_asyl = ifelse(year_asyl %in% c(-5,-2,-1), NA_real_, year_asyl),
-         religious_affiliation = factor(religious_affiliation, levels = c(-5, -2, -1, 4, 5, 6, 7), 
-                                        labels = c(NA_real_, NA_real_, NA_real_, "muslim", "other", "atheist", "christian")),
-         marital_status = factor(marital_status, levels = c(-8, -5, -3, -1, 1, 2, 3, 4, 5, 6, 7),
-                                 labels = c(NA_real_, NA_real_, NA_real_, NA_real_, "single", "married", "cohabitation", "separated", "cohabitation ended", "widowed", "partner deceased")),
+         religious_affiliation = factor(religious_affiliation, levels = c(4, 5, 6, 7), 
+                                        labels = c("muslim", "other", "atheist", "christian")),
+         marital_status = factor(marital_status, levels = c( 1, 2, 3, 4, 5, 6, 7),
+                                 labels = c("single", "married", "cohabitation", "separated", "cohabitation ended", "widowed", "partner deceased")),
          
-         german_speaking = factor(german_speaking, levels = c(-5, -1, 1, 2, 3, 4, 5),
-                                  labels = c(NA_real_, NA_real_, "yes", "yes", "yes", "normal", "no")),
-         german_reading = factor(german_reading, levels = c(-5, -1, 1, 2, 3, 4, 5),
-                                  labels = c(NA_real_, NA_real_, "yes", "yes", "yes", "normal", "no")),
-         german_writing = factor(german_writing, levels = c(-5, -1, 1, 2, 3, 4, 5),
-                                 labels = c(NA_real_, NA_real_, "yes", "yes", "yes", "normal", "no")),
-         school_abroad_certificate = factor(school_abroad_certificate, levels = c(-5, -2, -1, 1, 2, 3, 4, 5),
-                                            labels = c(NA_real_, NA_real_, NA_real_, "low", "medium", "high", "high", "medium")),
-         country_last_school = ifelse(country_last_school %in% c(-8, -5,-2,-1), NA_real_, country_last_school),
-         school_degree = factor(school_degree, levels = c(-5, -2, -1, 1, 2, 3, 4, 5, 6 ),
-                         labels = c(NA_real_, NA_real_, NA_real_, "low", "medium", "medium", "high", "high", "medium")),
-         arrival_family = factor(arrival_family, levels = c(-5 ,-2, 1),
-                                 labels= c(NA_real_, "no", "yes")),
-         help_refuge_family = factor(help_refuge_family, levels = c(-5 ,-2, 1),
-                                     labels= c(NA_real_, "no", "yes")),
-         education_outside_ger = factor(education_outside_ger, levels = c(-5 ,-1, 1, 2),
-                                        labels= c(NA_real_, NA_real_, "yes", "no"))
+         german_speaking = factor(german_speaking, levels = c( 1, 2, 3, 4, 5),
+                                  labels = c("yes", "yes", "yes", "normal", "no")),
+         german_reading = factor(german_reading, levels = c(1, 2, 3, 4, 5),
+                                  labels = c( "yes", "yes", "yes", "normal", "no")),
+         german_writing = factor(german_writing, levels = c(1, 2, 3, 4, 5),
+                                 labels = c("yes", "yes", "yes", "normal", "no")),
+         school_abroad_certificate = factor(school_abroad_certificate, levels = c( 1, 2, 3, 4, 5),
+                                            labels = c("low", "medium", "high", "high", "medium")),
+         school_degree = factor(school_degree, levels = c(1, 2, 3, 4, 5, 6 ),
+                         labels = c("low", "medium", "medium", "high", "high", "medium")),
+         arrival_family = factor(arrival_family, levels = c(-2, 1),
+                                 labels= c("no", "yes")),
+         help_refuge_family = factor(help_refuge_family, levels = c(-2, 1),
+                                     labels= c("no", "yes")),
+         education_outside_ger = factor(education_outside_ger, levels = c( 1, 2),
+                                        labels= c( "yes", "no"))
          
          
   )
 
-         
+# Integers
+data <- data %>%
+  mutate(first_res = ifelse(first_res == -8, NA, first_res),
+         number_res = ifelse(number_res %in% c(-8, -5,-1), NA, number_res),
+         year_asyl = ifelse(year_asyl %in% c(-5,-2,-1), NA, year_asyl),
+         country_last_school = ifelse(country_last_school %in% c(-8, -5,-2,-1), NA, country_last_school)
+  )
 
          
         
 # Save data ----------
 
+# refugee data
+refugee_data <- data
+save(refugee_data, file = paste0(path_out,"refugee_data.RData"))
 
 
 
