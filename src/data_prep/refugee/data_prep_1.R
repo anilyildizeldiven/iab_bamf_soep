@@ -9,42 +9,36 @@
 library(dplyr)
 library(haven)
 
-# Define paths -------
-path_data_soep <- "C:/Users/ru23kek/Desktop/projects/data/soepdata/"
-path_data_soep_raw <- "C:/Users/ru23kek/Desktop/projects/data/soepdata/raw/"
-path_data_processed <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep/soepdata/processed/"
-path_out <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep/soepdata/processed/refugee/"
+# Define base path ----
+base_path <- "C:/Users/ru23kek/Desktop/projects/"
 
+# Define paths -------
+path_data_soep <- file.path(base_path, "data", "soepdata")
+path_data_soep_raw <- file.path(base_path, "data", "soepdata", "raw")
+path_data_processed <- file.path(base_path, "iab_bamf_soep", "soepdata", "processed")
+path_out <- file.path(base_path, "iab_bamf_soep", "soepdata", "processed", "refugee")
 
 # Load data ------------
 
 ## ppathl_subset_ref -----
 # Rows: 88.074
-# Columns: 45
-load(paste0(path_data_processed, "ppathl_subset_ref.RData"))
-
+load(file.path(path_data_processed, "ppathl_subset_ref.RData"))
 
 ## hbrutto -------
 # Rows: 501.622
-# Columns: 102
-hbrutto <- read_dta(paste0(path_data_soep, "hbrutto.dta"))
-
+hbrutto <- read_dta(file.path(path_data_soep, "hbrutto.dta"))
 
 ## biol -------
 # Rows: 130.429
-# Columns: 3579
-biol <- read_dta(paste0(path_data_soep, "biol.dta"))
-
+biol <- read_dta(file.path(path_data_soep, "biol.dta"))
 
 ## regionl -----
 # Rows: 652.238
-# Columns: 36
-regionl <- read_dta(paste0(path_data_soep, "regionl.dta"))
+regionl <- read_dta(file.path(path_data_soep, "regionl.dta"))
 
 ## bioregion ----
 # Rows: 68.489
-# Columns: 94
-bioregion <- read_dta(paste0(path_data_soep_raw, "bioregion.dta"))
+bioregion <- read_dta(file.path(path_data_soep_raw, "bioregion.dta"))
 
 
 
@@ -54,7 +48,6 @@ bioregion <- read_dta(paste0(path_data_soep_raw, "bioregion.dta"))
 ## ppathl_subset_ref -----
 # Keep only variables of interest
 # Rows: 88.074
-# Columns: 18
 ppathl_variables <- c("pid", "hid", "parid",
                       "syear","eintritt", "austritt",
                       "erstbefr", "letztbef", "immiyear",
@@ -107,7 +100,6 @@ bioregion_subset <- bioregion_subset %>%
 # Input: ppath_subset_ref and hbrutto_subset
 # Output: data_prep_1
 # Rows: 88.074
-# Columns: 27
 
 data_prep_1 <- ppathl_subset_ref %>%
   left_join(biol_subset, by = c("pid", "hid", "syear")) %>%
@@ -118,7 +110,7 @@ data_prep_1 <- ppathl_subset_ref %>%
 # Save data ------
 
 # data_prep_1
-save(data_prep_1, file = paste0(path_out,"data_prep_1.RData"))
+save(data_prep_1, file = file.path(path_out, "data_prep_1.RData"))
 
 
 

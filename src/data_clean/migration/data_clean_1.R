@@ -1,6 +1,6 @@
 ################################## Clean Data ####################################
 # Input: data_prep_3
-# output: refugee_data
+# output: migrants_data
 
 
 # Load packages ------
@@ -12,19 +12,19 @@ library(ggplot2)
 library(viridis)
 library(RColorBrewer)
 
-# Base path ------
+# Define base path  -------
 base_path <- "C:/Users/ru23kek/Desktop/projects/"
 
-# Define paths ------
+# Define paths ----------
 path_data_soep <- file.path(base_path, "data", "soepdata")
-path_data_processed <- file.path(base_path, "iab_bamf_soep", "soepdata", "processed", "refugee")
+path_data_processed <- file.path(base_path, "iab_bamf_soep", "soepdata", "processed", "migrants")
 path_out <- file.path(base_path, "iab_bamf_soep", "soepdata", "final")
 
-# Load data ------
-
+# Load data ---------
 # data_prep_3 
-# Rows: 88.074
+# Rows: 76.064
 load(file.path(path_data_processed, "data_prep_3.RData"))
+
 
 # Rename data --------
 
@@ -37,32 +37,22 @@ data <- data %>%
   mutate(age = syear - gebjahr)
 
 ## State Residence ----
-# bula_res == lr3367_h if lr3367_h >= 1 or
+# bula_res == lb1436_h if lb1436_h >= 1 or
 
 data <- data %>%
   group_by(pid) %>%
-  mutate(bula_res = ifelse(lr3367_h >= 1, lr3367_h, NA_real_ )) %>%
+  mutate(bula_res = ifelse(lb1436_h >= 1, lb1436_h, NA_real_ )) %>%
   fill(bula_res, .direction = "downup") 
 
-
-# bula_res == lr2074_h if lr2074_h >= 1 or
-data <- data %>%
-  group_by(pid) %>%
-  mutate(bula_res = ifelse(is.na(bula_res) & lr2074_h >= 1, lr2074_h, bula_res)) %>%
-  fill(bula_res, .direction = "downup") 
-
-# bula_res == place_bula if place_bula >= 1 or
+# bula_res == place_bula if is.na(bula_res) & place_bula >= 1 or
 data <- data %>%
   group_by(pid) %>%
   mutate(bula_res = ifelse(is.na(bula_res) & place_bula >= 1, place_bula, bula_res)) %>%
   fill(bula_res, .direction = "downup") 
 
+data_test <- data %>%
+  select(c("pid", "syear", "lb1436_h", "bula", "place_type", "place_bula", "bula_res"))
 
-# bula_res == bula if is.na(bula_res) & lr3235 %in% c(1)
-data <- data %>%
-  group_by(pid) %>%
-  mutate(bula_res = ifelse(is.na(bula_res) & lr3235 %in% c(1), bula, bula_res))  %>%
-  fill(bula_res, .direction = "downup") 
 
 ## Free-case --------
 # free_case == 2 if lr3168==1
@@ -89,7 +79,7 @@ data <- data %>%
   mutate(free_case = ifelse(is.na(free_case), 1, free_case)) %>%
   fill(free_case, .direction = "downup") 
 
-           
+
 # Subset Data -------
 
 # Keep only refugees >18
@@ -177,7 +167,7 @@ data <- data %>%
             "lb1246" , "lb1247_v1",
             "lb1248", "lr3142",  "lr3168", "biwfam",
             "place_type", "bifamc", "bifamcl"
-            ))
+  ))
 
 # Order columns ---------
 
@@ -212,12 +202,12 @@ data <- data %>%
          number_res = as.integer(number_res),
          year_asyl = as.integer(year_asyl),
          country_last_school = as.integer(country_last_school))
-         
+
 
 # Factors 
 data <- data %>%
   mutate(employment = factor(employment, levels = c(9, 1, 2, 3, 4, 5, 7, 10),
-                            labels = c("no", "yes", "yes", "yes", "yes", "yes", "yes", "yes")),
+                             labels = c("no", "yes", "yes", "yes", "yes", "yes", "yes", "yes")),
          sex = factor(sex, levels = c(1,2), labels = c("male", "female")),
          partner = factor(partner, levels = c(0, 1, 2, 3, 4, 5),
                           labels = c("no", "married", "cohabitation", "prob_married", "prob_cohabitation", "not_clear")),
@@ -229,13 +219,13 @@ data <- data %>%
          german_speaking = factor(german_speaking, levels = c( 1, 2, 3, 4, 5),
                                   labels = c("yes", "yes", "yes", "normal", "no")),
          german_reading = factor(german_reading, levels = c(1, 2, 3, 4, 5),
-                                  labels = c( "yes", "yes", "yes", "normal", "no")),
+                                 labels = c( "yes", "yes", "yes", "normal", "no")),
          german_writing = factor(german_writing, levels = c(1, 2, 3, 4, 5),
                                  labels = c("yes", "yes", "yes", "normal", "no")),
          school_abroad_certificate = factor(school_abroad_certificate, levels = c( 1, 2, 3, 4, 5),
                                             labels = c("low", "medium", "high", "high", "medium")),
          school_degree = factor(school_degree, levels = c(1, 2, 3, 4, 5, 6 ),
-                         labels = c("low", "medium", "medium", "high", "high", "medium")),
+                                labels = c("low", "medium", "medium", "high", "high", "medium")),
          arrival_family = factor(arrival_family, levels = c(-2, 1),
                                  labels= c("no", "yes")),
          help_refuge_family = factor(help_refuge_family, levels = c(-2, 1),
@@ -254,16 +244,12 @@ data <- data %>%
          country_last_school = ifelse(country_last_school %in% c(-8, -5,-2,-1), NA, country_last_school)
   )
 
-         
-        
+
+
 # Save data ----------
 
 # refugee data
 refugee_data <- data
 save(refugee_data, file = paste0(path_out,"refugee_data.RData"))
-
-
-
-
 
 
