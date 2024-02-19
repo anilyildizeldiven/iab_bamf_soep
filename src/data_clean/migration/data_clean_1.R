@@ -9,8 +9,7 @@ library(dplyr)
 library(tidyr)
 library(haven)
 library(ggplot2)
-library(viridis)
-library(RColorBrewer)
+
 
 # Define base path  -------
 base_path <- "C:/Users/ru23kek/Desktop/projects/"
@@ -30,112 +29,50 @@ load(file.path(path_data_processed, "data_prep_3.RData"))
 
 data <- data_prep_3
 
-# Create columns ----
-
-## Age -----
-data <- data %>%
-  mutate(age = syear - gebjahr)
-
-## State Residence ----
-# bula_res == lb1436_h if lb1436_h >= 1 or
-
-data <- data %>%
-  group_by(pid) %>%
-  mutate(bula_res = ifelse(lb1436_h >= 1, lb1436_h, NA_real_ )) %>%
-  fill(bula_res, .direction = "downup") 
-
-# bula_res == place_bula if is.na(bula_res) & place_bula >= 1 or
-data <- data %>%
-  group_by(pid) %>%
-  mutate(bula_res = ifelse(is.na(bula_res) & place_bula >= 1, place_bula, bula_res)) %>%
-  fill(bula_res, .direction = "downup") 
-
-data_test <- data %>%
-  select(c("pid", "syear", "lb1436_h", "bula", "place_type", "place_bula", "bula_res"))
-
-
-## Free-case --------
-# free_case == 2 if lr3168==1
-data <- data %>%
-  group_by(pid) %>%
-  mutate(free_case = ifelse(lr3168==1, 2, NA_real_)) %>%
-  fill(free_case, .direction = "downup") 
-
-# free_case == 2 if lr3142==1
-data <- data %>%
-  group_by(pid) %>%
-  mutate(free_case = ifelse(is.na(free_case) & lr3142==1, 2, free_case)) %>%
-  fill(free_case, .direction = "downup") 
-
-# free_case == 2 if lb1246==1
-data <- data %>%
-  group_by(pid) %>%
-  mutate(free_case = ifelse(is.na(free_case) & lb1246==1, 2, free_case)) %>%
-  fill(free_case, .direction = "downup") 
-
-# free_case ==1 if is.na(free_case)
-data <- data %>%
-  group_by(pid) %>%
-  mutate(free_case = ifelse(is.na(free_case), 1, free_case)) %>%
-  fill(free_case, .direction = "downup") 
-
-
 # Subset Data -------
 
-# Keep only refugees >18
-# age >= 18
-# Rows: 48.662
-data <- data %>%
-  subset(age >= 18 & age <2017)
-
-# Keep only those that were not born in germany
+# Keep only those that were not born in Germany
 # germborn == 2
-# Rows: 48.433
+# Rows: 46.663
 data <- data  %>%
   subset(germborn == 2)
 
 # Keep those with direct migration background
 # migback == 2
-# Rows: 48.433
+# Rows: 46.663
 data <- data  %>%
   subset(migback == 2)
 
-# Keep only those with direct refugee experience
-# arefback == 2
-# Rows: 47.720
-data <- data  %>%
-  subset(arefback == 2)
-
 # Keep only if first interview and last interview information not missing
-# Rows: 41.118
+# Rows: 37.912
 data <- data  %>%
   subset(erstbefr != -2 & letztbef != -2)
 
-# Keep only if corigin known
+# Keep only if country of origin known
 # corigin != -1
-# Rows: 41.109
+# Rows: 37.878
 data <- data  %>%
   subset(corigin != -1)
 
 # Keep only those that immigrated 2 years before first survey
 # erstbefr - immiyear <= 2
 # Rows: 31.225
-data <- data  %>%
-  subset(erstbefr - immiyear <= 2)
+#data <- data  %>%
+  #subset(erstbefr - immiyear <= 2)
 
-# Keep only if federal state residence not missing
-# !is.na(bula_res)
-# Rows: 29.628
+# Keep only if year of immigration not missing
+# !is.na(immiyear) & immiyear >-1
+# Rows: 37.149
 data <- data  %>%
-  subset(!is.na(bula_res))
+  subset(!is.na(immiyear) & immiyear >-1)
+
 
 # Keep only the first survey year of each person ID
 # syear == erstbefr
-# Rows: 6573
+# Rows: 7839
 data <- data  %>%
   group_by(pid) %>%
   filter(syear == erstbefr)
-
 
 
 # Rename columns ---------
@@ -145,28 +82,176 @@ data <- data %>%
          last_int = letztbef,
          birth_year = gebjahr,
          birth_month = gebmonat,
-         number_res = lr3235,
-         employment = plb0022_h,
-         past_employment = lr2110,
-         employment_year =  lr2098,
+         first_residence= lb1436_h,
+         employment_status_now = plb0022_h,
+         employment_now = lb0265,
+         past_employment_v1 = lb1421,
+         past_employment_v2 = lm0607i02,
+         employment_year =  lm0607i01,
          religious_affiliation = plh0258_h,
          marital_status = pld0131_h,
          german_speaking = lm0128i01,
          german_writing = lm0128i02,
          german_reading = lm0128i03,
-         school_degree = lr3079,
+         support_migration_family= lb1246,
+         school_country_v1 = lb0186_v1,
+         school_country_v2 = lb0186_v2,
+         school_degree = lb0188 ,
          school_years = lb0187,
-         vocational_training = lb0228)
+         vocational_training = lb0228,
+         support_migration_friends_v1 = lb1247_v1,
+         support_migration_friends_v2 = lb1247_v2,
+         no_support_migration = lb1248,
+         choice_germany_family = lr3168)
 
-# Remove columns --------
+
+# Create columns ----
+
+## Age -----
+data <- data %>%
+  mutate(age = syear - birth_year)
+
+## Age Immigration ----
+data <- data %>%
+  mutate(age_immigration = immiyear - birth_year)
+
+
+## State Residence ----
+# bula_res == first_residence if first_residence >= 1 or
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(bula_res = ifelse(first_residence >= 1, first_residence, NA_real_ )) %>%
+  fill(bula_res, .direction = "downup") 
+
+# bula_res == place_bula if is.na(bula_res) & place_bula >= 1 or
+data <- data %>%
+  group_by(pid) %>%
+  mutate(bula_res = ifelse(is.na(bula_res) & place_bula >= 1, place_bula, bula_res)) %>%
+  fill(bula_res, .direction = "downup") 
+
+#data_test <- data %>%
+  #select(c("pid", "syear", "first_residence", "bula", "place_type", "place_bula", "bula_res"))
+
+
+## Free-case --------
+# free_case == 0 if choice_germany_family==1
+data <- data %>%
+  group_by(pid) %>%
+  mutate(free_case = ifelse(choice_germany_family==1, 0, NA_real_)) %>%
+  fill(free_case, .direction = "downup") 
+
+# free_case == 0 if support_migration_family==1
+data <- data %>%
+  group_by(pid) %>%
+  mutate(free_case = ifelse(is.na(free_case) & support_migration_family==1, 0, free_case)) %>%
+  fill(free_case, .direction = "downup") 
+
+# free_case ==1 if is.na(free_case)
+data <- data %>%
+  group_by(pid) %>%
+  mutate(free_case = ifelse(is.na(free_case), 1, free_case)) %>%
+  fill(free_case, .direction = "downup") 
+
+
+## Employment ------
+
+# Employment 0 Year of Arrival
+data <- data %>%
+  mutate(employment_year_arrival = ifelse(employment_year==immiyear, 1, 0))
+
+# Employment 1 Year after Arrival
+data <- data %>%
+  mutate(employment_one_year_arrival = ifelse(employment_year-immiyear==1, 1, 0))
+
+# Employment 2 Year after Arrival
+data <- data %>%
+  mutate(employment_two_year_arrival = ifelse(employment_year-immiyear==2, 1, 0))
+
+
+## Schooling degree -------
+
+# If country of school foreign
+data <- data %>%
+  mutate(school_degree_low = ifelse(school_country_v1 ==3 &  school_degree ==1 | school_country_v2 ==3 &  school_degree ==1,
+                                    1,0),
+         school_degree_med = ifelse(school_country_v1 ==3 &  school_degree ==2 | school_country_v2 ==3 &  school_degree ==2,
+                                    1,0),
+         school_degree_high = ifelse(school_country_v1 ==3 &  school_degree ==3 | school_country_v2 ==3 &  school_degree ==3,
+                                     1,0))
+data <- data %>%
+  mutate(school_degree_abroad = ifelse(school_degree_low == 1, 1,
+                                  ifelse(school_degree_med == 1, 2,
+                                         ifelse(school_degree_high == 1, 3, NA))))
+
+
+# Data Type ---------
+
+# Integers 
+data <- data %>%
+  mutate(pid = as.integer(pid),
+         hid = as.integer(hid),
+         syear = as.integer(syear),
+         first_int = as.integer(first_int),
+         last_int = as.integer(last_int),
+         immiyear = as.integer(immiyear),
+         psample = as.integer(psample),
+         age = as.integer(age),
+         age_immigration = as.integer(age_immigration),
+         bula_res = as.integer(bula_res),
+         birth_year = as.integer(birth_year),
+         birth_month = as.integer(birth_month),
+         partner = as.factor(partner),
+         parid = as.integer(parid),
+         corigin = as.integer(corigin),
+         school_years = as.integer(school_years)
+         )
+
+
+# Factors 
+data <- data %>%
+  mutate(employment_now = factor(employment_now, levels = c(2,1),
+                                          labels = c("no", "yes")),
+         employment_year_arrival = factor(employment_year_arrival, levels = c(0,1),
+                             labels = c("no", "yes")),
+         employment_one_year_arrival = factor(employment_one_year_arrival, levels = c(0,1),
+                                          labels = c("no", "yes")),
+         employment_two_year_arrival = factor(employment_two_year_arrival, levels = c(0,1),
+                                          labels = c("no", "yes")),
+         sex = factor(sex, levels = c(1,2), labels = c("male", "female")),
+         partner = factor(partner, levels = c(0, 1, 2, 3, 4, 5),
+                          labels = c("no", "married", "cohabitation", "prob married", "prob cohabitation", "not clear")),
+         religious_affiliation = factor(religious_affiliation, levels = c(4, 5, 6, 7), 
+                                        labels = c("muslim", "other", "atheist", "christian")),
+         marital_status = factor(marital_status, levels = c( 1, 2, 3, 4, 5, 6, 7),
+                                 labels = c("single", "married", "cohabitation", "separated", "cohabitation ended", "widowed", "partner deceased")),
+         german_speaking = factor(german_speaking, levels = c( 1, 2, 3, 4, 5),
+                                  labels = c("high", "high", "medium", "medium", "low")),
+         german_reading = factor(german_reading, levels = c(1, 2, 3, 4, 5),
+                                 labels = c("high", "high", "medium", "medium", "low")),
+         german_writing = factor(german_writing, levels = c(1, 2, 3, 4, 5),
+                                 labels = c("high", "high", "medium", "medium", "low")),
+         school_degree_abroad = factor(school_degree_abroad, levels = c(1, 2, 3),
+                                labels = c("low", "medium", "high")),
+         free_case = factor(free_case, levels = c(0, 1),
+                                        labels= c( "no", "yes")),
+         vocational_training = factor(vocational_training, levels = c(2, 1),
+                                               labels= c( "no", "yes"))
+         
+)
+
+
+# Select columns --------
 
 data <- data %>%
   select(-c("eintritt", "austritt", "migback", 
-            "arefback", "germborn", "bula",
-            "lr2074_h", "lr3367_h",
-            "lb1246" , "lb1247_v1",
-            "lb1248", "lr3142",  "lr3168", "biwfam",
-            "place_type", "bifamc", "bifamcl"
+            "arefback", "germborn", "first_residence",
+            "bula", "place_bula", "place_type", "employment_status_now",
+            "employment_year", "past_employment_v1", "past_employment_v2",
+            "lr3079", "school_country_v1", "school_country_v2", "school_degree",
+            "support_migration_friends_v1", "support_migration_friends_v2",
+            "support_migration_family", "no_support_migration", "choice_germany_family"
+            
   ))
 
 # Order columns ---------
@@ -174,82 +259,37 @@ data <- data %>%
 data <- data %>%
   select(pid, hid, syear, 
          first_int, last_int, immiyear, psample, 
-         age, 
-         sex, birth_year, birth_month, free_case,
+         age, sex, birth_year, birth_month, free_case,
          partner, parid,
-         bula_res, employment, past_employment, employment_year,
+         bula_res, age_immigration, employment_year_arrival, employment_one_year_arrival, employment_two_year_arrival,
          everything())
 
-# Modify columns ---------
 
-# Data type
+# Subset final ----------
+
+
+# Keep only migrants >18
+# age >= 18
+# Rows: 7.641
 data <- data %>%
-  mutate(pid = as.integer(pid),
-         hid = as.integer(hid),
-         syear = as.integer(syear),
-         erstbefr = as.integer(erstbefr),
-         letztbef = as.integer(letztbef),
-         immiyear = as.integer(immiyear),
-         psample = as.integer(psample),
-         age = as.integer(age),
-         bula_res = as.integer(bula_res),
-         gebjahr = as.integer(gebjahr),
-         gebmonat = as.integer(gebmonat),
-         partner = as.factor(partner),
-         parid = as.integer(parid),
-         corigin = as.integer(corigin),
-         first_res = as.integer(first_res),
-         number_res = as.integer(number_res),
-         year_asyl = as.integer(year_asyl),
-         country_last_school = as.integer(country_last_school))
+  subset(age >= 18 & age <2017)
 
-
-# Factors 
+# Keep only migrants with >18 in immigration year
+# age_immigration >= 18
+# Rows: 6.401
 data <- data %>%
-  mutate(employment = factor(employment, levels = c(9, 1, 2, 3, 4, 5, 7, 10),
-                             labels = c("no", "yes", "yes", "yes", "yes", "yes", "yes", "yes")),
-         sex = factor(sex, levels = c(1,2), labels = c("male", "female")),
-         partner = factor(partner, levels = c(0, 1, 2, 3, 4, 5),
-                          labels = c("no", "married", "cohabitation", "prob_married", "prob_cohabitation", "not_clear")),
-         religious_affiliation = factor(religious_affiliation, levels = c(4, 5, 6, 7), 
-                                        labels = c("muslim", "other", "atheist", "christian")),
-         marital_status = factor(marital_status, levels = c( 1, 2, 3, 4, 5, 6, 7),
-                                 labels = c("single", "married", "cohabitation", "separated", "cohabitation ended", "widowed", "partner deceased")),
-         
-         german_speaking = factor(german_speaking, levels = c( 1, 2, 3, 4, 5),
-                                  labels = c("yes", "yes", "yes", "normal", "no")),
-         german_reading = factor(german_reading, levels = c(1, 2, 3, 4, 5),
-                                 labels = c( "yes", "yes", "yes", "normal", "no")),
-         german_writing = factor(german_writing, levels = c(1, 2, 3, 4, 5),
-                                 labels = c("yes", "yes", "yes", "normal", "no")),
-         school_abroad_certificate = factor(school_abroad_certificate, levels = c( 1, 2, 3, 4, 5),
-                                            labels = c("low", "medium", "high", "high", "medium")),
-         school_degree = factor(school_degree, levels = c(1, 2, 3, 4, 5, 6 ),
-                                labels = c("low", "medium", "medium", "high", "high", "medium")),
-         arrival_family = factor(arrival_family, levels = c(-2, 1),
-                                 labels= c("no", "yes")),
-         help_refuge_family = factor(help_refuge_family, levels = c(-2, 1),
-                                     labels= c("no", "yes")),
-         education_outside_ger = factor(education_outside_ger, levels = c( 1, 2),
-                                        labels= c( "yes", "no"))
-         
-         
-  )
+  subset(age_immigration >= 18)
 
-# Integers
-data <- data %>%
-  mutate(first_res = ifelse(first_res == -8, NA, first_res),
-         number_res = ifelse(number_res %in% c(-8, -5,-1), NA, number_res),
-         year_asyl = ifelse(year_asyl %in% c(-5,-2,-1), NA, year_asyl),
-         country_last_school = ifelse(country_last_school %in% c(-8, -5,-2,-1), NA, country_last_school)
-  )
-
-
+# Keep only if federal state residence not missing
+# !is.na(bula_res)
+# Rows: 3.401
+data <- data  %>%
+  subset(!is.na(bula_res))
 
 # Save data ----------
 
-# refugee data
-refugee_data <- data
-save(refugee_data, file = paste0(path_out,"refugee_data.RData"))
+# migrants_data
+migrants_data <- data
+save(migrants_data, file = paste0(path_out,"migrants_data.RData"))
 
 

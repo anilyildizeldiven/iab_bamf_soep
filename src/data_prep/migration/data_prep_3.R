@@ -55,7 +55,7 @@ pl_subset <- pl_subset_mig[,pl_variables]
 # lm0128i01 - German speaking before arrival (Zuzug)
 # lm0128i02 - German writing before arrival (Zuzug)
 # lm0128i03 - German listening before arrival (Zuzug)
-# lb0186 - Country last attended school (only relevant for migration)
+# lb0186_v1 and lb0186_v2 - Country last attended school (only relevant for migration)
 # lb0188 - Degree school
 # lb0187 - Schooling years
 # lb1246 - Help relatives
