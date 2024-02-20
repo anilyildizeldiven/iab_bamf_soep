@@ -67,14 +67,6 @@ data <- data  %>%
   subset(!is.na(immiyear) & immiyear >-1)
 
 
-# Keep only the first survey year of each person ID
-# syear == erstbefr
-# Rows: 7839
-data <- data  %>%
-  group_by(pid) %>%
-  filter(syear == erstbefr)
-
-
 # Rename columns ---------
 
 data <- data %>%
@@ -178,12 +170,10 @@ data <- data %>%
          school_degree_med = ifelse(school_country_v1 ==3 &  school_degree ==2 | school_country_v2 ==3 &  school_degree ==2,
                                     1,0),
          school_degree_high = ifelse(school_country_v1 ==3 &  school_degree ==3 | school_country_v2 ==3 &  school_degree ==3,
-                                     1,0))
-data <- data %>%
+                                     1,0)) %>%
   mutate(school_degree_abroad = ifelse(school_degree_low == 1, 1,
                                   ifelse(school_degree_med == 1, 2,
                                          ifelse(school_degree_high == 1, 3, NA))))
-
 
 # Data Type ---------
 
@@ -220,17 +210,17 @@ data <- data %>%
                                           labels = c("no", "yes")),
          sex = factor(sex, levels = c(1,2), labels = c("male", "female")),
          partner = factor(partner, levels = c(0, 1, 2, 3, 4, 5),
-                          labels = c("no", "married", "cohabitation", "prob married", "prob cohabitation", "not clear")),
-         religious_affiliation = factor(religious_affiliation, levels = c(4, 5, 6, 7), 
-                                        labels = c("muslim", "other", "atheist", "christian")),
-         marital_status = factor(marital_status, levels = c( 1, 2, 3, 4, 5, 6, 7),
-                                 labels = c("single", "married", "cohabitation", "separated", "cohabitation ended", "widowed", "partner deceased")),
-         german_speaking = factor(german_speaking, levels = c( 1, 2, 3, 4, 5),
-                                  labels = c("high", "high", "medium", "medium", "low")),
-         german_reading = factor(german_reading, levels = c(1, 2, 3, 4, 5),
-                                 labels = c("high", "high", "medium", "medium", "low")),
-         german_writing = factor(german_writing, levels = c(1, 2, 3, 4, 5),
-                                 labels = c("high", "high", "medium", "medium", "low")),
+                          labels = c("no", "married", "cohabitation", "married", "cohabitation", "not clear")),
+         religious_affiliation = factor(religious_affiliation, levels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), 
+                                        labels = c("catholic", "protestant", "other christian", "muslim", "other", "atheist", "christian orthodox", "shiite religious", "sunni religious", "alevi religious")),
+         marital_status = factor(marital_status, levels = c( 1, 2, 3, 4, 5),
+                                 labels = c("married", "cohabitation", "single", "divorced", "widowed")),
+         german_speaking = factor(german_speaking, levels = c(5, 3, 4, 1, 2),
+                                  labels = c("low", "medium", "medium", "high", "high")),
+         german_reading = factor(german_reading, levels = c(5, 3, 4, 1, 2),
+                                 labels = c("low", "medium", "medium", "high", "high")),
+         german_writing = factor(german_writing, levels = c(5, 3, 4, 1, 2),
+                                 labels = c("low", "medium", "medium", "high", "high")),
          school_degree_abroad = factor(school_degree_abroad, levels = c(1, 2, 3),
                                 labels = c("low", "medium", "high")),
          free_case = factor(free_case, levels = c(0, 1),
@@ -268,6 +258,13 @@ data <- data %>%
 # Subset final ----------
 
 
+# Keep only the first survey year of each person ID
+# syear == erstbefr
+# Rows: 7839
+data <- data  %>%
+  group_by(pid) %>%
+  filter(syear == first_int)
+
 # Keep only migrants >18
 # age >= 18
 # Rows: 7.641
@@ -282,9 +279,10 @@ data <- data %>%
 
 # Keep only if federal state residence not missing
 # !is.na(bula_res)
-# Rows: 3.401
+# Rows: 4.732
 data <- data  %>%
   subset(!is.na(bula_res))
+
 
 # Save data ----------
 
