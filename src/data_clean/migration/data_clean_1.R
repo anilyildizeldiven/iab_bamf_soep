@@ -172,8 +172,8 @@ data <- data %>%
          school_degree_high = ifelse(school_country_v1 ==3 &  school_degree ==3 | school_country_v2 ==3 &  school_degree ==3,
                                      1,0)) %>%
   mutate(school_degree_abroad = ifelse(school_degree_low == 1, 1,
-                                  ifelse(school_degree_med == 1, 2,
-                                         ifelse(school_degree_high == 1, 3, NA))))
+                                       ifelse(school_degree_med == 1, 2,
+                                              ifelse(school_degree_high == 1, 3, NA))))
 
 # Data Type ---------
 
@@ -287,7 +287,7 @@ data <- data  %>%
 # Save data ----------
 
 # migrants_data
+# Rows: 4.732
 migrants_data <- data
-save(migrants_data, file = paste0(path_out,"migrants_data.RData"))
-
+save(migrants_data, file = file.path(path_out, "migrants_data.RData"))
 
