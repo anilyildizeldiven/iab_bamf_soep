@@ -45,10 +45,14 @@ bioimmig <- read_dta(file.path(path_data_soep, "bioimmig.dta"))
 # Relevant questions:
 # plh0258_h - Religious affiliation
 # pld0131_h - Marital status
+# plj0698 - english_read
+# plj0699 - english_write
+# plj0700 - english_speak
 
 
 pl_variables <- c("pid", "hid", "syear",
-                 "plh0258_h", "pld0131_h")
+                 "plh0258_h", "pld0131_h",
+                 "plj0698", "plj0699", "plj0700")
 
 
 pl_subset <- pl_subset_ref[,pl_variables]
@@ -59,6 +63,9 @@ pl_subset <- pl_subset_ref[,pl_variables]
 # lm0128i01 - German speaking before arrival (Zuzug)
 # lm0128i02 - German writing before arrival (Zuzug)
 # lm0128i03 - German listening before arrival (Zuzug)
+# lr2087 - read and write level
+# lr2088 - Read level
+# lr2109 - Write level
 #  - Country last attended school (only relevant for migration)
 # lr3079 - Degree school
 # lb0187 - Schooling years
@@ -72,7 +79,8 @@ pl_subset <- pl_subset_ref[,pl_variables]
 
 biol_variables <- c("pid", "hid", "syear",
                     "lm0128i01", "lm0128i02", 
-                    "lm0128i03", "lr3079",
+                    "lm0128i03","lr2087",
+                    "lr2088", "lr2109", "lr3079",
                     "lb0187", "lb1246", 
                     "lb1247_v1", "lb1247_v2",
                     "lb1248", "lb0228", "lr3142", "lr3168")
