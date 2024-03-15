@@ -226,7 +226,6 @@ data <- data %>%
                                         labels = c("catholic", "protestant", "other christian", "muslim", "other", "atheist", "christian orthodox", "shiite religious", "sunni religious", "alevi religious")),
          marital_status = factor(marital_status, levels = c( 1, 2, 3, 4, 5),
                                  labels = c("married", "cohabitation", "single", "divorced", "widowed")),
-         
          english_speaking = factor(english_speaking, levels = c(5, 4, 3, 2, 1),
                                   labels = c("low", "low", "medium", "medium", "high")),
          english_reading = factor(english_reading, levels = c(5, 4, 3, 2, 1),
