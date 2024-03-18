@@ -1,5 +1,5 @@
 ############################## 3 - Prepare Data ####################################
-# Refugees and Socio-Demographic Characteristics
+# Refugees and socio-Demographic Characteristics
 # Input data set: data_prep_2
 # Output data set: data_prep_3
 # Aim: merge free-case no/yes and further data

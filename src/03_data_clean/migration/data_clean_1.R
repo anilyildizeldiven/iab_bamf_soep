@@ -162,7 +162,10 @@ data <- data %>%
 
 # If country of school foreign
 data <- data %>%
-  mutate(school_degree_low = ifelse(school_country_v1 ==3 &  school_degree ==1 | school_country_v2 ==3 &  school_degree ==1,
+  mutate(school_degree = ifelse(school_degree<0,NA,school_degree),
+         school_country_v1 = ifelse(school_country_v1 <0,NA,school_country_v1),
+         school_country_v2 = ifelse(school_country_v2<0,NA,school_country_v2),
+         school_degree_low = ifelse(school_country_v1 ==3 &  school_degree ==1 | school_country_v2 ==3 &  school_degree ==1,
                                     1,0),
          school_degree_med = ifelse(school_country_v1 ==3 &  school_degree ==2 | school_country_v2 ==3 &  school_degree ==2,
                                     1,0),
