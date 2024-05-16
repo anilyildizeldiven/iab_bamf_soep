@@ -8,8 +8,8 @@ library(dplyr)
 library(haven)
 
 # Define paths -------
-path_data_soep <- "C:/Users/ru23kek/Desktop/projects/data/soepdata/"
-path_out <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep_project/soepdata/processed/"
+path_data_soep <- "/Users/clarastrasser/soep_data/"
+path_out <- "/Users/clarastrasser/soep_data/processed/"
 
 
 # Load data ------------
@@ -62,7 +62,7 @@ save(unique_pid_ref, file = paste0(path_out,"unique_pid_ref.RData"))
 
 ## ppathl_subset_mig -------
 save(ppathl_subset_mig, file = paste0(path_out,"ppathl_subset_mig.RData"))
-save(ppathl_subset_mig, file = paste0(path_out,"ppathl_subset_mig.RData"))
+save(unique_pid_mig, file = paste0(path_out,"unique_pid_mig.RData"))
 
 
 

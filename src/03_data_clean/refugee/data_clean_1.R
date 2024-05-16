@@ -10,12 +10,12 @@ library(tidyr)
 library(haven)
 
 # Base path --------------------------------------------------------------------
-base_path <- "C:/Users/ru23kek/Desktop/projects/"
+base_path <- "/Users/clarastrasser/"
 
 # Define paths ------
-path_data_soep <- file.path(base_path, "data", "soepdata")
-path_data_processed <- file.path(base_path, "iab_bamf_soep", "soepdata", "processed", "refugee")
-path_out <- file.path(base_path, "iab_bamf_soep", "soepdata", "final")
+path_data_soep <- file.path(base_path, "soep_data")
+path_data_processed <- file.path(base_path,  "soep_data", "processed", "refugee")
+path_out <- file.path(base_path, "soep_data", "final")
 
 # Load data --------------------------------------------------------------------
 
@@ -262,7 +262,7 @@ data <- data %>%
             "arefback", "germborn", "longest_residence",
             "first_residence", "number_residences",
             "bula", "place_bula", "place_type", 
-            "employment_year", "past_employment",
+            "past_employment",
             "school_degree", "support_migration_friends_v1", "support_migration_friends_v2",
             "support_migration_family", "no_support_migration", "choice_germany_family", 
             "choice_leave_family", "biwfam", "bifamc",  "bifamcl"

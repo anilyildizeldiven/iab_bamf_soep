@@ -12,12 +12,12 @@ library(ggplot2)
 
 
 # Define base path  ------------------------------------------------------------
-base_path <- "C:/Users/ru23kek/Desktop/projects/"
+base_path <- "/Users/clarastrasser/"
 
 # Define paths -----------------------------------------------------------------
-path_data_soep <- file.path(base_path, "data", "soepdata")
-path_data_processed <- file.path(base_path, "iab_bamf_soep", "soepdata", "processed", "migrants")
-path_out <- file.path(base_path, "iab_bamf_soep", "soepdata", "final")
+path_data_soep <- file.path(base_path, "soep_data")
+path_data_processed <- file.path(base_path,  "soep_data", "processed", "migrants")
+path_out <- file.path(base_path, "soep_data", "final")
 
 # Load data --------------------------------------------------------------------
 # data_prep_3 
@@ -54,12 +54,6 @@ data <- data  %>%
 data <- data  %>%
   subset(corigin != -1)
 
-# Keep only those that immigrated 2 years before first survey
-# erstbefr - immiyear <= 2
-# Rows: 31.225
-#data <- data  %>%
-  #subset(erstbefr - immiyear <= 2)
-
 # Keep only if year of immigration not missing
 # !is.na(immiyear) & immiyear >-1
 # Rows: 37.149
@@ -80,6 +74,7 @@ data <- data %>%
          past_employment_v1 = lb1421,
          past_employment_v2 = lm0607i02,
          employment_year =  lm0607i01,
+         employment_year2 = lm0615i01,
          religious_affiliation = plh0258_h,
          marital_status = pld0131_h,
          english_speaking = plj0700,
@@ -144,6 +139,9 @@ data <- data %>%
 
 
 ## Employment -----------------------------------------------
+
+data <- data %>%
+  mutate(employment_year_new = ifelse(is.na(employment_year)| employment_year<0, employment_year2, employment_year))
 
 # Employment 0 Year of Arrival
 data <- data %>%

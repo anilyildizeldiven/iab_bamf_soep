@@ -8,9 +8,9 @@ library(dplyr)
 library(haven)
 
 # Define paths -------
-path_data_soep <- "C:/Users/ru23kek/Desktop/projects/data/soepdata/"
-path_data_processed <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep_project/soepdata/processed/"
-path_out <- "C:/Users/ru23kek/Desktop/projects/iab_bamf_soep_project/soepdata/processed/"
+path_data_soep <- "/Users/clarastrasser/soep_data/"
+path_data_processed <- "/Users/clarastrasser/soep_data/processed/"
+path_out <- "/Users/clarastrasser/soep_data/processed/"
 
 
 # Load data ------------

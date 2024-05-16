@@ -5,16 +5,15 @@
 # Aim: merge free-case no/yes and further data
 
 
-# Load packages ------
+# Load packages ----------------------------------------------------------------
 library(dplyr)
 library(haven)
 
-# Define base path -------
-base_path <- "C:/Users/ru23kek/Desktop/projects/"
-
-# Define paths -------
-path_data_soep <- file.path(base_path, "data", "soepdata")
-path_data_processed <- file.path(base_path, "iab_bamf_soep", "soepdata", "processed")
+# Define paths -----------------------------------------------------------------
+base_path <- "/Users/clarastrasser/"
+path_data_soep <- file.path(base_path, "soep_data", "data")
+path_data_soep_raw <- file.path(path_data_soep, "raw")
+path_data_processed <- file.path(base_path, "soep_data", "processed")
 path_data_processed_mig <- file.path(path_data_processed, "migrants")
 path_out <- path_data_processed_mig
 
