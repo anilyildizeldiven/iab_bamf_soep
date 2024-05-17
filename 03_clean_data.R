@@ -3,7 +3,7 @@
 # data_prep
 # Output data set:
 # data_clean
-# Aim: Create final variables 
+# Aim: Create variables 
 # 01 - Federal State of first residence
 # 02 - Employment 
 # 03 - Individual-level characteristics
@@ -94,24 +94,19 @@ data <- data %>%
          year_last_employment = lb0266_h,
          religious_affiliation = plh0258_h,
          marital_status = pld0131_h,
-         german_speaking = lm0128i01,
-         german_writing = lm0128i02,
-         german_reading = lm0128i03,
+         german_speaking_v1 = lm0128i01,
+         german_writing_v1 = lm0128i02,
+         german_reading_v1 = lm0128i03,
          school_degree_v1 = lr3079,
          school_degree_v2 = lb0188,
-         school_years = lb0187,
-         vocational_training = lb0228)
+         school_years_v1 = lb0187,
+         vocational_training_v1 = lb0228)
 
 # Create columns ---------------------------------------------------------------
 
 ## 01 - FEDERAL STATE OF FIRST RESIDENCE ---------------------------------------
 # Aim: create bula_res
-# How:
-# bula_res == first_residence_ref if first_residence_ref >= 1 or
-# bula_res == first_residence_mig if first_residence_mig >= 1 or
-# bula_res == longest_residence if longest_residence >= 1 or
-# bula_res == place_bula if place_bula >= 1 or
-# bula_res == bula if is.na(bula_res) & number_residences %in% c(1)
+# bula_res: Federat state of first residence
 
 # bula_res == first_residence_ref if first_residence_ref >= 1 or
 data <- data %>%
@@ -122,7 +117,7 @@ data <- data %>%
 # bula_res == first_residence_mig if first_residence_mig >= 1 or
 data <- data %>%
   group_by(pid) %>%
-  mutate(bula_res = ifelse(first_residence_mig >= 1, first_residence_mig, bula_res )) %>%
+  mutate(bula_res = ifelse(is.na(bula_res) & first_residence_mig >= 1, first_residence_mig, bula_res)) %>%
   fill(bula_res, .direction = "downup") 
 
 # bula_res == longest_residence if longest_residence >= 1 or
@@ -145,16 +140,150 @@ data <- data %>%
 
 
 ## 02 - EMPLOYMENT -------------------------------------------------------------
-# Aim: create bula_res
-# How:
+# Aim: create employment_year
+# employment_year: Year of first employment in Germany
+
+# employment_year == year_first_employment_v1 if year_first_employment_v1 >= 1 or
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_year = ifelse(year_first_employment_v1 >= 1, year_first_employment_v1, NA_real_ )) %>%
+  fill(employment_year, .direction = "downup") 
+
+# employment_year == year_first_employment_v2 if year_first_employment_v2 >= 1 or
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_year = ifelse(is.na(employment_year) & year_first_employment_v2 >= 1, year_first_employment_v2, employment_year)) %>%
+  fill(employment_year, .direction = "downup") 
+
+# employment_year == year_first_employment_v3 if year_first_employment_v3 >= 1 or
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_year = ifelse(is.na(employment_year) & year_first_employment_v3 >= 1, year_first_employment_v3, employment_year)) %>%
+  fill(employment_year, .direction = "downup") 
+
+# employment_year == einstieg_pbio if einstieg_pbio >=1 & stillfj == 1
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_year = ifelse(is.na(employment_year) & einstieg_pbio >= 1 & stillfj == 1, einstieg_pbio, employment_year)) %>%
+  fill(employment_year, .direction = "downup") 
+
+# employment_year == einstieg_pbio if einstieg_pbio >=1 & occmove == 1
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_year = ifelse(is.na(employment_year) & einstieg_pbio >= 1 & occmove == 1, einstieg_pbio, employment_year)) %>%
+  fill(employment_year, .direction = "downup") 
 
 
+# employment_year == 0 if ever_employed_ger_v2 == 2
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_year = ifelse(is.na(employment_year) & ever_employed_ger_v2 == 2, 0, employment_year)) %>%
+  fill(employment_year, .direction = "downup") 
+
+# employment_year == 0 if ever_employed_ger_v1 == 2
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_year = ifelse(is.na(employment_year) & ever_employed_ger_v1 == 2, 0, employment_year)) %>%
+  fill(employment_year, .direction = "downup") 
+
+# employment_year == 0 if never_employed_ger == 1
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_year = ifelse(is.na(employment_year) & never_employed_ger == 1, 0, employment_year)) %>%
+  fill(employment_year, .direction = "downup") 
+
+# employment_year == 0 if never_employed_life == 1
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_year = ifelse(is.na(employment_year) & never_employed_life == 1, 0, employment_year)) %>%
+  fill(employment_year, .direction = "downup") 
 
 
+## 03 - INDIVIDUAL-LEVEL CHARACTERISTICS ---------------------------------------
+# Aim: create individual-level variables
+# age: age survey year
+# age_immigration: age year of immigration
+# free_case: indicator of person is free case (has partner but was assigned to other
+# federal state) or not (has partner and was assigned to same federal state)
+
+# age
+data <- data %>%
+  mutate(age = syear - birth_year)
+
+# age_immigration
+data <- data %>%
+  mutate(age_immigration = immiyear - birth_year)
+
+# german_speaking
+data <- data %>%
+  group_by(pid) %>%
+  mutate(german_speaking = ifelse(german_speaking_v1 >= 1, german_speaking_v1, NA_real_ )) %>%
+  fill(german_speaking, .direction = "downup") 
+
+# german_writing
+data <- data %>%
+  group_by(pid) %>%
+  mutate(german_writing = ifelse(german_writing_v1 >= 1, german_writing_v1, NA_real_ )) %>%
+  fill(german_writing, .direction = "downup") 
+
+# german_reading
+data <- data %>%
+  group_by(pid) %>%
+  mutate(german_reading = ifelse(german_reading_v1 >= 1, german_reading_v1, NA_real_ )) %>%
+  fill(german_reading, .direction = "downup") 
+
+# school_degree
+data <- data %>%
+  group_by(pid) %>%
+  mutate(school_degree = ifelse(school_degree_v1 >= 1, school_degree_v1, NA_real_ )) %>%
+  fill(school_degree, .direction = "downup") 
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(school_degree = ifelse(is.na(school_degree) & school_degree_v2 >= 1, school_degree_v2, school_degree )) %>%
+  fill(school_degree, .direction = "downup") 
 
 
+# school_years
+data <- data %>%
+  group_by(pid) %>%
+  mutate(school_years = ifelse(school_years_v1 >= 1, school_years_v1, NA_real_ )) %>%
+  fill(school_years, .direction = "downup") 
 
 
+# vocational_training
+data <- data %>%
+  group_by(pid) %>%
+  mutate(vocational_training = ifelse(vocational_training_v1 >= 1, vocational_training_v1, NA_real_ )) %>%
+  fill(vocational_training, .direction = "downup") 
+
+
+# Subset data ------------------------------------------------------------------
+
+# Keep only the first survey year of each person ID
+# syear == erstbefr
+# Rows: 18.053
+data <- data  %>%
+  group_by(pid) %>%
+  filter(syear == first_int)
+
+# Keep only migrants with >=18 in immigration year
+# age_immigration >= 18
+# Rows: 15.352
+data <- data %>%
+  subset(age_immigration >= 18)
+
+# Keep only if federal state residence not missing
+# !is.na(bula_res)
+# Rows: 13.285
+data <- data  %>%
+  subset(!is.na(bula_res))
+
+
+# Save data --------------------------------------------------------------------
+
+data_clean <- data
+save(data_clean, file = paste0(path_data_processed,"/data_clean.RData"))
 
 
 
