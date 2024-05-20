@@ -215,6 +215,12 @@ data <- data %>%
 data <- data %>%
   mutate(age_immigration = immiyear - birth_year)
 
+# religious_affiliation
+data <- data %>%
+  group_by(pid) %>%
+  mutate(religious_affiliation = ifelse(religious_affiliation >= 1, religious_affiliation, NA_real_ )) %>%
+  fill(religious_affiliation, .direction = "downup") 
+
 # german_speaking
 data <- data %>%
   group_by(pid) %>%
