@@ -181,6 +181,10 @@ pl_03 <- pl_ref_mig %>%
 # lm0128i03: German listening before arrival (Zuzug)
 # lr3079: Degree school (for Refugees)
 # lb0188: Degree school (for Migrants)
+# lb0191: Degree school (for Refugees)
+# lb0186_v1: School country 
+# lb0186_v2: School country
+# lb0186_v3: School country
 # lb0187: Schooling years
 # lb0228: Vocational Training Outside Germany
 
@@ -188,8 +192,9 @@ pl_03 <- pl_ref_mig %>%
 biol_03 <- biol %>%
   select(c("pid", "hid", "syear",
            "lm0128i01", "lm0128i02", "lm0128i03",
-           "lr3079", "lb0188", "lb0187",
-           "lb0228"))
+           "lr3079", "lb0188", "lb0191",
+            "lb0186_v1", "lb0186_v2", "lb0186_v3",
+           "lb0187", "lb0228"))
 
 ## Merge data ---------
 

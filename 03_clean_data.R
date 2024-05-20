@@ -97,8 +97,12 @@ data <- data %>%
          german_speaking_v1 = lm0128i01,
          german_writing_v1 = lm0128i02,
          german_reading_v1 = lm0128i03,
+         school_country_v1 = lb0186_v1,
+         school_country_v2 = lb0186_v2,
+         school_country_v3 = lb0186_v3,
          school_degree_v1 = lr3079,
          school_degree_v2 = lb0188,
+         school_degree_v3 = lb0191,
          school_years_v1 = lb0187,
          vocational_training_v1 = lb0228)
 
@@ -201,10 +205,7 @@ data <- data %>%
 
 ## 03 - INDIVIDUAL-LEVEL CHARACTERISTICS ---------------------------------------
 # Aim: create individual-level variables
-# age: age survey year
-# age_immigration: age year of immigration
-# free_case: indicator of person is free case (has partner but was assigned to other
-# federal state) or not (has partner and was assigned to same federal state)
+
 
 # age
 data <- data %>%
@@ -232,16 +233,39 @@ data <- data %>%
   mutate(german_reading = ifelse(german_reading_v1 >= 1, german_reading_v1, NA_real_ )) %>%
   fill(german_reading, .direction = "downup") 
 
-# school_degree
+# school_degree_ref
 data <- data %>%
   group_by(pid) %>%
-  mutate(school_degree = ifelse(school_degree_v1 >= 1, school_degree_v1, NA_real_ )) %>%
-  fill(school_degree, .direction = "downup") 
+  mutate(school_degree_ref = ifelse(school_degree_v1 >= 1, school_degree_v1, NA_real_ )) %>%
+  fill(school_degree_ref, .direction = "downup") 
+
+# school_degree_mig
+data <- data %>%
+  group_by(pid) %>%
+  mutate(school_degree_mig = ifelse(school_degree_v2 >= 1, school_degree_v2, NA_real_ )) %>%
+  fill(school_degree_mig, .direction = "downup") 
+
+# school_degree_other
+data <- data %>%
+  group_by(pid) %>%
+  mutate(school_degree_other = ifelse(school_degree_v3 >= 1, school_degree_v3, NA_real_ )) %>%
+  fill(school_degree_other, .direction = "downup") 
+
+# school country
+data <- data %>%
+  group_by(pid) %>%
+  mutate(school_country = ifelse(school_country_v1 >= 1, school_country_v1, NA_real_ )) %>%
+  fill(school_country, .direction = "downup") 
 
 data <- data %>%
   group_by(pid) %>%
-  mutate(school_degree = ifelse(is.na(school_degree) & school_degree_v2 >= 1, school_degree_v2, school_degree )) %>%
-  fill(school_degree, .direction = "downup") 
+  mutate(school_country = ifelse(is.na(school_country) & school_country_v2 >= 1, school_country_v2, school_country )) %>%
+  fill(school_country, .direction = "downup") 
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(school_country = ifelse(is.na(school_country) & school_country_v3 >= 1, school_country_v3, school_country )) %>%
+  fill(school_country, .direction = "downup") 
 
 
 # school_years
