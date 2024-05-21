@@ -113,9 +113,10 @@ data_prep_1 <- ppathl_01 %>%
 
 # pl
 # plb0022_h: Are you currently employed? 
+# plb0418: When do you want to take up gainful employment?
 pl_02 <- pl_ref_mig %>%
   select("pid", "hid", "syear",
-         "plb0022_h")
+         "plb0022_h", "plb0418")
 
 
 # biol

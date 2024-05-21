@@ -121,27 +121,26 @@ data <- data %>%
 # bula_res == first_residence_mig if first_residence_mig >= 1 or
 data <- data %>%
   group_by(pid) %>%
-  mutate(bula_res = ifelse(is.na(bula_res) & first_residence_mig >= 1, first_residence_mig, bula_res)) %>%
+  mutate(bula_res = ifelse((is.na(bula_res) & first_residence_mig >= 1), first_residence_mig, bula_res)) %>%
   fill(bula_res, .direction = "downup") 
 
 # bula_res == longest_residence if longest_residence >= 1 or
 data <- data %>%
   group_by(pid) %>%
-  mutate(bula_res = ifelse(is.na(bula_res) & longest_residence >= 1, longest_residence, bula_res)) %>%
+  mutate(bula_res = ifelse((is.na(bula_res) & longest_residence >= 1), longest_residence, bula_res)) %>%
   fill(bula_res, .direction = "downup") 
 
 # bula_res == place_bula if place_bula >= 1 or
 data <- data %>%
   group_by(pid) %>%
-  mutate(bula_res = ifelse(is.na(bula_res) & place_bula >= 1, place_bula, bula_res)) %>%
+  mutate(bula_res = ifelse((is.na(bula_res) & place_bula >= 1), place_bula, bula_res)) %>%
   fill(bula_res, .direction = "downup") 
 
 # bula_res == bula if is.na(bula_res) & number_residences %in% c(1)
 data <- data %>%
   group_by(pid) %>%
-  mutate(bula_res = ifelse(is.na(bula_res) & number_residences %in% c(1), bula, bula_res))  %>%
+  mutate(bula_res = ifelse((is.na(bula_res) & number_residences %in% c(1)), bula, bula_res))  %>%
   fill(bula_res, .direction = "downup") 
-
 
 ## 02 - EMPLOYMENT -------------------------------------------------------------
 # Aim: create employment_year
@@ -156,50 +155,50 @@ data <- data %>%
 # employment_year == year_first_employment_v2 if year_first_employment_v2 >= 1 or
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse(is.na(employment_year) & year_first_employment_v2 >= 1, year_first_employment_v2, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & year_first_employment_v2 >= 1), year_first_employment_v2, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
 # employment_year == year_first_employment_v3 if year_first_employment_v3 >= 1 or
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse(is.na(employment_year) & year_first_employment_v3 >= 1, year_first_employment_v3, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & year_first_employment_v3 >= 1), year_first_employment_v3, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
 # employment_year == einstieg_pbio if einstieg_pbio >=1 & stillfj == 1
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse(is.na(employment_year) & einstieg_pbio >= 1 & stillfj == 1, einstieg_pbio, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & einstieg_pbio >= 1 & stillfj == 1), einstieg_pbio, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
 # employment_year == einstieg_pbio if einstieg_pbio >=1 & occmove == 1
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse(is.na(employment_year) & einstieg_pbio >= 1 & occmove == 1, einstieg_pbio, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & einstieg_pbio >= 1 & occmove == 1), einstieg_pbio, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
 
 # employment_year == 0 if ever_employed_ger_v2 == 2
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse(is.na(employment_year) & ever_employed_ger_v2 == 2, 0, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & ever_employed_ger_v2 == 2), 0, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
 # employment_year == 0 if ever_employed_ger_v1 == 2
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse(is.na(employment_year) & ever_employed_ger_v1 == 2, 0, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & ever_employed_ger_v1 == 2), 0, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
 # employment_year == 0 if never_employed_ger == 1
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse(is.na(employment_year) & never_employed_ger == 1, 0, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & never_employed_ger == 1), 0, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
 # employment_year == 0 if never_employed_life == 1
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse(is.na(employment_year) & never_employed_life == 1, 0, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & never_employed_life == 1), 0, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
 

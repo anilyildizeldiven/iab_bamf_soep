@@ -61,7 +61,6 @@ data <- data %>%
   mutate(employment_one_year_arrival = ifelse(employment_one_year_arrival== 0 & employment_year==0,0,employment_one_year_arrival)) %>%
   mutate(employment_one_year_arrival = ifelse(employment_one_year_arrival == 0 & employment_year_arrival==1,1,employment_one_year_arrival)) 
   
-
 # Employment 2 Years after Arrival
 data <- data %>%
   mutate(employment_two_year_arrival = ifelse(employment_year-immiyear==2, 1, 0)) %>%
@@ -247,12 +246,18 @@ data <- data %>%
          employment_three_year_arrival, employment_four_year_arrival,
          everything())
 
+# Subset data ------------------------------------------------------------------
+
+# Keep only working age population: 18-67
+# Rows: 13.234
+data <- data %>%
+  filter(age_immigration >= 18 & age_immigration <= 67)
 
 # Save data --------------------------------------------------------------------
 
 # Rows: 13.285
-# Ref: 8553
-# Mig: 4732
+# Ref: 8.553
+# Mig: 4.732
 data_final <- data
 save(data_final, file = paste0(path_data_final,"/data_final.RData"))
 
