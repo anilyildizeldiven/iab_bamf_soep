@@ -201,6 +201,147 @@ data <- data %>%
   mutate(employment_year = ifelse((is.na(employment_year) & never_employed_life == 1), 0, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
+# Aim: create employment_year_arrival
+# employment_year_arrival: employment in first year of arrival
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_year_arrival = ifelse(employment_year==immiyear, 1, 0)) %>%
+  mutate(employment_year_arrival = ifelse(is.na(employment_year), NA, employment_year_arrival)) %>%
+  mutate(employment_year_arrival = ifelse(employment_year==0,0,employment_year_arrival))
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_year_arrival = ifelse((is.na(employment_year_arrival) & 
+                                             syear == immiyear &
+                                             employment_now %in% c(1:8, 10:12)),1, employment_year_arrival)) %>%
+ fill(employment_year_arrival, .direction = "downup") 
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_year_arrival = ifelse((is.na(employment_year_arrival) & 
+                                             syear == immiyear &
+                                             employment_now %in% c(9)),0, employment_year_arrival)) %>%
+  fill(employment_year_arrival, .direction = "downup") 
+
+# Aim: create employment_one_year_arrival
+# employment_one_year_arrival: employment 1 year after arrival
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_one_year_arrival = ifelse(employment_year-immiyear==1, 1, 0)) %>%
+  mutate(employment_one_year_arrival = ifelse(is.na(employment_year), NA, employment_one_year_arrival)) %>%
+  mutate(employment_one_year_arrival = ifelse(employment_one_year_arrival== 0 & employment_year==0,0,employment_one_year_arrival)) %>%
+  mutate(employment_one_year_arrival = ifelse((employment_one_year_arrival == 0 | is.na(employment_one_year_arrival)) & employment_year_arrival==1,1,employment_one_year_arrival)) 
+
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_one_year_arrival = ifelse((is.na(employment_one_year_arrival) & 
+                                             syear - immiyear == 1 &
+                                             employment_now %in% c(1:8, 10:12)),1, employment_one_year_arrival)) %>%
+  fill(employment_one_year_arrival, .direction = "downup") 
+
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_one_year_arrival = ifelse((is.na(employment_one_year_arrival) & 
+                                                 syear - immiyear == 1 &
+                                             employment_now %in% c(9)),0, employment_one_year_arrival)) %>%
+  fill(employment_one_year_arrival, .direction = "downup") 
+
+
+# Aim: create employment_two_year_arrival
+# employment_two_year_arrival: employment 2 year after arrival
+
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_two_year_arrival = ifelse(employment_year-immiyear==2, 1, 0)) %>%
+  mutate(employment_two_year_arrival = ifelse(is.na(employment_year), NA, employment_two_year_arrival)) %>%
+  mutate(employment_two_year_arrival = ifelse(employment_two_year_arrival== 0 & employment_year==0,0,employment_two_year_arrival)) %>%
+  mutate(employment_two_year_arrival = ifelse((employment_two_year_arrival == 0 | is.na(employment_two_year_arrival))  & employment_one_year_arrival==1,1,employment_two_year_arrival)) 
+
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_two_year_arrival = ifelse((is.na(employment_two_year_arrival) & 
+                                                 syear - immiyear == 2 &
+                                                 employment_now %in% c(1:8, 10:12)),1, employment_two_year_arrival)) %>%
+  fill(employment_two_year_arrival, .direction = "downup") 
+
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_two_year_arrival = ifelse((is.na(employment_two_year_arrival) & 
+                                                 syear - immiyear == 2 &
+                                                 employment_now %in% c(9)),0, employment_two_year_arrival)) %>%
+  fill(employment_two_year_arrival, .direction = "downup") 
+
+
+# Aim: create employment_three_year_arrival
+# employment_three_year_arrival: employment 3 year after arrival
+
+data <- data %>%
+  mutate(employment_three_year_arrival = ifelse(employment_year-immiyear==3, 1, 0)) %>%
+  mutate(employment_three_year_arrival = ifelse(is.na(employment_year), NA, employment_three_year_arrival)) %>%
+  mutate(employment_three_year_arrival = ifelse(employment_three_year_arrival== 0 & employment_year==0,0,employment_three_year_arrival)) %>%
+  mutate(employment_three_year_arrival = ifelse((employment_three_year_arrival == 0 | is.na(employment_three_year_arrival)) & employment_two_year_arrival==1,1,employment_three_year_arrival)) 
+
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_three_year_arrival = ifelse((is.na(employment_three_year_arrival) & 
+                                                 syear - immiyear == 3 &
+                                                 employment_now %in% c(1:8, 10:12)),1, employment_three_year_arrival)) %>%
+  fill(employment_three_year_arrival, .direction = "downup") 
+
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_three_year_arrival = ifelse((is.na(employment_three_year_arrival) & 
+                                                 syear - immiyear == 3 &
+                                                 employment_now %in% c(9)),0, employment_three_year_arrival)) %>%
+  fill(employment_three_year_arrival, .direction = "downup") 
+
+
+# Aim: create employment_four_year_arrival
+# employment_four_year_arrival: employment 4 year after arrival
+
+
+data <- data %>%
+  mutate(employment_four_year_arrival = ifelse(employment_year-immiyear==4, 1, 0)) %>%
+  mutate(employment_four_year_arrival = ifelse(is.na(employment_year), NA, employment_four_year_arrival)) %>%
+  mutate(employment_four_year_arrival = ifelse(employment_four_year_arrival== 0 & employment_year==0,0,employment_four_year_arrival)) %>%
+  mutate(employment_four_year_arrival = ifelse((employment_four_year_arrival == 0 | is.na(employment_four_year_arrival)) & employment_three_year_arrival==1,1,employment_four_year_arrival)) 
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_four_year_arrival = ifelse((is.na(employment_four_year_arrival) & 
+                                                   syear - immiyear == 4 &
+                                                   employment_now %in% c(1:8, 10:12)),1, employment_four_year_arrival)) %>%
+  fill(employment_four_year_arrival, .direction = "downup") 
+
+
+data <- data %>%
+  group_by(pid) %>%
+  mutate(employment_four_year_arrival = ifelse((is.na(employment_four_year_arrival) & 
+                                                   syear - immiyear == 4 &
+                                                   employment_now %in% c(9)),0, employment_four_year_arrival)) %>%
+  fill(employment_four_year_arrival, .direction = "downup") 
+
+
+data_test <- data %>%
+  mutate(pid = as.integer(pid),
+         syear = as.integer(syear)) %>%
+  select(c("pid", "employment_year", "employment_year_arrival", "employment_one_year_arrival", 
+          "employment_two_year_arrival", "employment_three_year_arrival", "employment_four_year_arrival", "employment_now", "syear", "first_int", "last_int", "immiyear"))
+
+# 31789102
+# 36096702
+# 36112601
+# 31789102
+# 32436206
 
 ## 03 - INDIVIDUAL-LEVEL CHARACTERISTICS ---------------------------------------
 # Aim: create individual-level variables
