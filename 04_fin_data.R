@@ -18,7 +18,7 @@ path_data_final <- file.path(base_path, "soep_data", "final")
 # Load data --------------------------------------------------------------------
 
 # data_clean
-# Rows: 13.285
+# Rows: 13.517
 load(file.path(path_data_processed, "data_clean.RData"))
 
 # Rename data ------------------------------------------------------------------
@@ -29,6 +29,8 @@ data <- data_clean
 ## 01 - FEDERAL STATE OF FIRST RESIDENCE ---------------------------------------
 # Variables:
 # bula_res
+# Output:
+# 1 to 16
 
 
 # Nothing to modify
@@ -46,42 +48,7 @@ data <- data_clean
 # 1 - yes
 # 0 - no
 
-
-# Employment 0 Year of Arrival
-data <- data %>%
-  mutate(employment_year_arrival = ifelse(employment_year==immiyear, 1, 0)) %>%
-  mutate(employment_year_arrival = ifelse(is.na(employment_year), NA, employment_year_arrival)) %>%
-  mutate(employment_year_arrival = ifelse(employment_year==0,0,employment_year_arrival))
-
-
-# Employment 1 Year after Arrival
-data <- data %>%
-  mutate(employment_one_year_arrival = ifelse(employment_year-immiyear==1, 1, 0)) %>%
-  mutate(employment_one_year_arrival = ifelse(is.na(employment_year), NA, employment_one_year_arrival)) %>%
-  mutate(employment_one_year_arrival = ifelse(employment_one_year_arrival== 0 & employment_year==0,0,employment_one_year_arrival)) %>%
-  mutate(employment_one_year_arrival = ifelse(employment_one_year_arrival == 0 & employment_year_arrival==1,1,employment_one_year_arrival)) 
-  
-# Employment 2 Years after Arrival
-data <- data %>%
-  mutate(employment_two_year_arrival = ifelse(employment_year-immiyear==2, 1, 0)) %>%
-  mutate(employment_two_year_arrival = ifelse(is.na(employment_year), NA, employment_two_year_arrival)) %>%
-  mutate(employment_two_year_arrival = ifelse(employment_two_year_arrival== 0 & employment_year==0,0,employment_two_year_arrival)) %>%
-  mutate(employment_two_year_arrival = ifelse(employment_two_year_arrival == 0 & employment_one_year_arrival==1,1,employment_two_year_arrival)) 
-
-# Employment 3 Years after Arrival
-data <- data %>%
-  mutate(employment_three_year_arrival = ifelse(employment_year-immiyear==3, 1, 0)) %>%
-  mutate(employment_three_year_arrival = ifelse(is.na(employment_year), NA, employment_three_year_arrival)) %>%
-  mutate(employment_three_year_arrival = ifelse(employment_three_year_arrival== 0 & employment_year==0,0,employment_three_year_arrival)) %>%
-  mutate(employment_three_year_arrival = ifelse(employment_three_year_arrival == 0 & employment_two_year_arrival==1,1,employment_three_year_arrival)) 
-
-# Employment 4 Years after Arrival
-data <- data %>%
-  mutate(employment_four_year_arrival = ifelse(employment_year-immiyear==4, 1, 0)) %>%
-  mutate(employment_four_year_arrival = ifelse(is.na(employment_year), NA, employment_four_year_arrival)) %>%
-  mutate(employment_four_year_arrival = ifelse(employment_four_year_arrival== 0 & employment_year==0,0,employment_four_year_arrival)) %>%
-  mutate(employment_four_year_arrival = ifelse(employment_four_year_arrival == 0 & employment_three_year_arrival==1,1,employment_four_year_arrival)) 
-
+# Nothing to modify
 
 ## 03 - INDIVIDUAL-LEVEL CHARACTERISTICS ---------------------------------------
 
@@ -212,6 +179,7 @@ data <- data %>%
          school_degree_med = as.numeric(school_degree_med),
          school_degree_high = as.numeric(school_degree_high),
          vocational_training = as.numeric(vocational_training),
+         employment_year = as.numeric(employment_year),
          employment_year_arrival = as.numeric(employment_year_arrival),
          employment_one_year_arrival= as.numeric(employment_one_year_arrival),
          employment_two_year_arrival= as.numeric(employment_two_year_arrival),
@@ -231,8 +199,8 @@ data <- data %>%
     "school_years", "sex", "refugee_sample", "free_case", "partner",
     "religious_affiliation", "german_speaking", "german_writing", "german_reading",
     "school_degree_low", "school_degree_med", "school_degree_high", "vocational_training",
-    "employment_year_arrival", "employment_one_year_arrival", "employment_two_year_arrival",
-    "employment_three_year_arrival", "employment_four_year_arrival"
+    "employment_year", "employment_year_arrival", "employment_one_year_arrival", 
+    "employment_two_year_arrival", "employment_three_year_arrival", "employment_four_year_arrival"
   ))
 
 
@@ -242,22 +210,37 @@ data <- data %>%
          first_int, last_int, immiyear, psample, 
          age, sex, birth_year, birth_month, free_case,
          partner, parid,
-         bula_res, age_immigration, employment_year_arrival, employment_one_year_arrival, employment_two_year_arrival,
+         bula_res, age_immigration, employment_year, employment_year_arrival, employment_one_year_arrival, employment_two_year_arrival,
          employment_three_year_arrival, employment_four_year_arrival,
          everything())
 
 # Subset data ------------------------------------------------------------------
 
 # Keep only working age population: 18-67
-# Rows: 13.234
+# Rows: 13.462
 data <- data %>%
   filter(age_immigration >= 18 & age_immigration <= 67)
 
+# Remove implausible values
+
+# employment_year < immiyear
+impl_1 <- data[data$employment_year < data$immiyear & data$employment_year != 0 & !is.na(data$employment_year),] # 206
+
+# immiyear > syear
+impl_2 <- data[data$immiyear > data$syear,] # 0
+
+# school_years > age_immigration
+impl_3 <- data[data$school_years > data$age_immigration & !is.na(data$school_years),] # 0
+
+implausible <- integer()
+implausible <- c(implausible, impl_1$pid, impl_2$pid, impl_3$pid)
+data <- data[!(data$pid %in% implausible),]
+
 # Save data --------------------------------------------------------------------
 
-# Rows: 13.285
-# Ref: 8.553
-# Mig: 4.732
+# Rows: 13.256
+# Ref: 8.677
+# Mig: 4.579
 data_final <- data
 save(data_final, file = paste0(path_data_final,"/data_final.RData"))
 

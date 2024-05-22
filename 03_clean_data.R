@@ -40,15 +40,9 @@ data <- data  %>%
 
 # Keep those with direct migration background
 # migback == 2
-# Rows: 78.346
+# Rows: 125.009
 data <- data  %>%
   subset(migback == 2)
-
-# Keep only those with direct refugee experience
-# arefback == 2
-# Rows: 
-#data <- data  %>%
-  #subset(arefback == 2)
 
 # Keep only if first interview and last interview information not missing
 # Rows: 81.230
@@ -110,7 +104,7 @@ data <- data %>%
 
 ## 01 - FEDERAL STATE OF FIRST RESIDENCE ---------------------------------------
 # Aim: create bula_res
-# bula_res: Federat state of first residence
+# bula_res: Federal state of first residence
 
 # bula_res == first_residence_ref if first_residence_ref >= 1 or
 data <- data %>%
@@ -121,88 +115,104 @@ data <- data %>%
 # bula_res == first_residence_mig if first_residence_mig >= 1 or
 data <- data %>%
   group_by(pid) %>%
-  mutate(bula_res = ifelse((is.na(bula_res) & first_residence_mig >= 1), first_residence_mig, bula_res)) %>%
+  mutate(bula_res = ifelse((is.na(bula_res) & !is.na(first_residence_mig) & first_residence_mig >= 1), first_residence_mig, bula_res)) %>%
   fill(bula_res, .direction = "downup") 
+
 
 # bula_res == longest_residence if longest_residence >= 1 or
 data <- data %>%
   group_by(pid) %>%
-  mutate(bula_res = ifelse((is.na(bula_res) & longest_residence >= 1), longest_residence, bula_res)) %>%
+  mutate(bula_res = ifelse((is.na(bula_res) & !is.na(longest_residence) & longest_residence >= 1), longest_residence, bula_res)) %>%
   fill(bula_res, .direction = "downup") 
 
 # bula_res == place_bula if place_bula >= 1 or
 data <- data %>%
   group_by(pid) %>%
-  mutate(bula_res = ifelse((is.na(bula_res) & place_bula >= 1), place_bula, bula_res)) %>%
+  mutate(bula_res = ifelse((is.na(bula_res) & !is.na(place_bula) & place_bula >= 1), place_bula, bula_res)) %>%
   fill(bula_res, .direction = "downup") 
 
 # bula_res == bula if is.na(bula_res) & number_residences %in% c(1)
 data <- data %>%
   group_by(pid) %>%
-  mutate(bula_res = ifelse((is.na(bula_res) & number_residences %in% c(1)), bula, bula_res))  %>%
+  mutate(bula_res = ifelse((is.na(bula_res) & !is.na(number_residences) & number_residences %in% c(1)), bula, bula_res))  %>%
   fill(bula_res, .direction = "downup") 
 
+# bula_res == bula if is.na(bula_res) & syear - immiyear <= 1
+data <- data %>%
+  group_by(pid) %>%
+  mutate(bula_res = ifelse((is.na(bula_res) & syear - immiyear <= 1), bula, bula_res))  %>%
+  fill(bula_res, .direction = "downup") 
+
+#data_test <- data %>%
+  #mutate(pid = as.integer(pid),
+         #syear = as.integer(syear)) %>%
+  #select(c("pid", "bula_res","first_residence_ref", "first_residence_mig", "longest_residence", "number_residences",
+           #"bula","place_bula", "syear", "first_int", "last_int", "immiyear"))
+
 ## 02 - EMPLOYMENT -------------------------------------------------------------
+
+### EMPLOYMENT YEAR ------------------------------------------------------------
 # Aim: create employment_year
 # employment_year: Year of first employment in Germany
 
-# employment_year == year_first_employment_v1 if year_first_employment_v1 >= 1 or
+# employment_year == year_first_employment_v1 if !is.na(year_first_employment_v1) & year_first_employment_v1 >= 1
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse(year_first_employment_v1 >= 1, year_first_employment_v1, NA_real_ )) %>%
+  mutate(employment_year = ifelse((!is.na(year_first_employment_v1) & year_first_employment_v1 >= 1), year_first_employment_v1, NA_real_ )) %>%
   fill(employment_year, .direction = "downup") 
 
-# employment_year == year_first_employment_v2 if year_first_employment_v2 >= 1 or
+# employment_year == year_first_employment_v2 if is.na(employment_year) & !is.na(year_first_employment_v2) & year_first_employment_v2 >= 1
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse((is.na(employment_year) & year_first_employment_v2 >= 1), year_first_employment_v2, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & !is.na(year_first_employment_v2) & year_first_employment_v2 >= 1), year_first_employment_v2, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
-# employment_year == year_first_employment_v3 if year_first_employment_v3 >= 1 or
+# employment_year == year_first_employment_v3 if is.na(employment_year) & !is.na(year_first_employment_v3) & year_first_employment_v3 >= 1
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse((is.na(employment_year) & year_first_employment_v3 >= 1), year_first_employment_v3, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & !is.na(year_first_employment_v3) & year_first_employment_v3 >= 1), year_first_employment_v3, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
-# employment_year == einstieg_pbio if einstieg_pbio >=1 & stillfj == 1
+# employment_year == einstieg_pbio if is.na(employment_year) & !is.na(einstieg_pbio) & einstieg_pbio >= 1 &  !is.na(stillfj) & stillfj == 1
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse((is.na(employment_year) & einstieg_pbio >= 1 & stillfj == 1), einstieg_pbio, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & !is.na(einstieg_pbio) & einstieg_pbio >= 1 &  !is.na(stillfj) & stillfj == 1), einstieg_pbio, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
-# employment_year == einstieg_pbio if einstieg_pbio >=1 & occmove == 1
+# employment_year == einstieg_pbio if is.na(employment_year) & !is.na(einstieg_pbio) & einstieg_pbio >= 1 &  !is.na(occmove) & occmove == 1
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse((is.na(employment_year) & einstieg_pbio >= 1 & occmove == 1), einstieg_pbio, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & !is.na(einstieg_pbio) & einstieg_pbio >= 1 &  !is.na(occmove) & occmove == 1), einstieg_pbio, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
-
-# employment_year == 0 if ever_employed_ger_v2 == 2
+# employment_year == 0 if is.na(employment_year) & !is.na(ever_employed_ger_v2) & ever_employed_ger_v2 == 2
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse((is.na(employment_year) & ever_employed_ger_v2 == 2), 0, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & !is.na(ever_employed_ger_v2) & ever_employed_ger_v2 == 2), 0, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
-# employment_year == 0 if ever_employed_ger_v1 == 2
+# employment_year == 0 if is.na(employment_year) & !is.na(ever_employed_ger_v1) & ever_employed_ger_v1 == 2
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse((is.na(employment_year) & ever_employed_ger_v1 == 2), 0, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & !is.na(ever_employed_ger_v1) & ever_employed_ger_v1 == 2), 0, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
-# employment_year == 0 if never_employed_ger == 1
+# employment_year == 0 if is.na(employment_year) & !is.na(never_employed_ger) & never_employed_ger == 1
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse((is.na(employment_year) & never_employed_ger == 1), 0, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & !is.na(never_employed_ger) & never_employed_ger == 1), 0, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
-# employment_year == 0 if never_employed_life == 1
+# employment_year == 0 if is.na(employment_year) & !is.na(never_employed_life) &  never_employed_life == 1
 data <- data %>%
   group_by(pid) %>%
-  mutate(employment_year = ifelse((is.na(employment_year) & never_employed_life == 1), 0, employment_year)) %>%
+  mutate(employment_year = ifelse((is.na(employment_year) & !is.na(never_employed_life) &  never_employed_life == 1), 0, employment_year)) %>%
   fill(employment_year, .direction = "downup") 
 
+
+### EMPLOYMENT YEAR ARRIVAL ----------------------------------------------------
 # Aim: create employment_year_arrival
-# employment_year_arrival: employment in first year of arrival
+# employment_year_arrival: employment in year of arrival yes/no
 
 data <- data %>%
   group_by(pid) %>%
@@ -215,17 +225,15 @@ data <- data %>%
   mutate(employment_year_arrival = ifelse((is.na(employment_year_arrival) & 
                                              syear == immiyear &
                                              employment_now %in% c(1:8, 10:12)),1, employment_year_arrival)) %>%
- fill(employment_year_arrival, .direction = "downup") 
-
-data <- data %>%
-  group_by(pid) %>%
   mutate(employment_year_arrival = ifelse((is.na(employment_year_arrival) & 
                                              syear == immiyear &
                                              employment_now %in% c(9)),0, employment_year_arrival)) %>%
   fill(employment_year_arrival, .direction = "downup") 
 
+
+### EMPLOYMENT 1 YEAR ARRIVAL --------------------------------------------------
 # Aim: create employment_one_year_arrival
-# employment_one_year_arrival: employment 1 year after arrival
+# employment_one_year_arrival: employment 1 year after arrival yes/no
 
 data <- data %>%
   group_by(pid) %>%
@@ -240,19 +248,15 @@ data <- data %>%
   mutate(employment_one_year_arrival = ifelse((is.na(employment_one_year_arrival) & 
                                              syear - immiyear == 1 &
                                              employment_now %in% c(1:8, 10:12)),1, employment_one_year_arrival)) %>%
-  fill(employment_one_year_arrival, .direction = "downup") 
-
-
-data <- data %>%
-  group_by(pid) %>%
   mutate(employment_one_year_arrival = ifelse((is.na(employment_one_year_arrival) & 
                                                  syear - immiyear == 1 &
                                              employment_now %in% c(9)),0, employment_one_year_arrival)) %>%
   fill(employment_one_year_arrival, .direction = "downup") 
 
 
+### EMPLOYMENT 2 YEAR ARRIVAL --------------------------------------------------
 # Aim: create employment_two_year_arrival
-# employment_two_year_arrival: employment 2 year after arrival
+# employment_two_year_arrival: employment 2 year after arrival yes/no
 
 
 data <- data %>%
@@ -268,19 +272,14 @@ data <- data %>%
   mutate(employment_two_year_arrival = ifelse((is.na(employment_two_year_arrival) & 
                                                  syear - immiyear == 2 &
                                                  employment_now %in% c(1:8, 10:12)),1, employment_two_year_arrival)) %>%
-  fill(employment_two_year_arrival, .direction = "downup") 
-
-
-data <- data %>%
-  group_by(pid) %>%
   mutate(employment_two_year_arrival = ifelse((is.na(employment_two_year_arrival) & 
                                                  syear - immiyear == 2 &
                                                  employment_now %in% c(9)),0, employment_two_year_arrival)) %>%
   fill(employment_two_year_arrival, .direction = "downup") 
 
-
+### EMPLOYMENT 3 YEAR ARRIVAL --------------------------------------------------
 # Aim: create employment_three_year_arrival
-# employment_three_year_arrival: employment 3 year after arrival
+# employment_three_year_arrival: employment 3 year after arrival yes/no
 
 data <- data %>%
   mutate(employment_three_year_arrival = ifelse(employment_year-immiyear==3, 1, 0)) %>%
@@ -294,19 +293,16 @@ data <- data %>%
   mutate(employment_three_year_arrival = ifelse((is.na(employment_three_year_arrival) & 
                                                  syear - immiyear == 3 &
                                                  employment_now %in% c(1:8, 10:12)),1, employment_three_year_arrival)) %>%
-  fill(employment_three_year_arrival, .direction = "downup") 
-
-
-data <- data %>%
-  group_by(pid) %>%
   mutate(employment_three_year_arrival = ifelse((is.na(employment_three_year_arrival) & 
                                                  syear - immiyear == 3 &
                                                  employment_now %in% c(9)),0, employment_three_year_arrival)) %>%
   fill(employment_three_year_arrival, .direction = "downup") 
 
 
-# Aim: create employment_four_year_arrival
-# employment_four_year_arrival: employment 4 year after arrival
+
+### EMPLOYMENT 4 YEAR ARRIVAL --------------------------------------------------
+# Aim: create employment_four_year_arrival 
+# employment_four_year_arrival: employment 4 year after arrival yes/no
 
 
 data <- data %>%
@@ -320,28 +316,18 @@ data <- data %>%
   mutate(employment_four_year_arrival = ifelse((is.na(employment_four_year_arrival) & 
                                                    syear - immiyear == 4 &
                                                    employment_now %in% c(1:8, 10:12)),1, employment_four_year_arrival)) %>%
-  fill(employment_four_year_arrival, .direction = "downup") 
-
-
-data <- data %>%
-  group_by(pid) %>%
   mutate(employment_four_year_arrival = ifelse((is.na(employment_four_year_arrival) & 
                                                    syear - immiyear == 4 &
                                                    employment_now %in% c(9)),0, employment_four_year_arrival)) %>%
   fill(employment_four_year_arrival, .direction = "downup") 
 
 
-data_test <- data %>%
-  mutate(pid = as.integer(pid),
-         syear = as.integer(syear)) %>%
-  select(c("pid", "employment_year", "employment_year_arrival", "employment_one_year_arrival", 
-          "employment_two_year_arrival", "employment_three_year_arrival", "employment_four_year_arrival", "employment_now", "syear", "first_int", "last_int", "immiyear"))
+#data_test <- data %>%
+  #mutate(pid = as.integer(pid),
+         #syear = as.integer(syear)) %>%
+  #select(c("pid", "employment_year", "employment_year_arrival", "employment_one_year_arrival", 
+          #"employment_two_year_arrival", "employment_three_year_arrival", "employment_four_year_arrival", "employment_now", "syear", "first_int", "last_int", "immiyear"))
 
-# 31789102
-# 36096702
-# 36112601
-# 31789102
-# 32436206
 
 ## 03 - INDIVIDUAL-LEVEL CHARACTERISTICS ---------------------------------------
 # Aim: create individual-level variables
@@ -437,7 +423,7 @@ data <- data  %>%
   group_by(pid) %>%
   filter(syear == first_int)
 
-# Keep only migrants with >=18 in immigration year
+# Keep only refugees with >=18 in immigration year
 # age_immigration >= 18
 # Rows: 15.352
 data <- data %>%
@@ -445,7 +431,7 @@ data <- data %>%
 
 # Keep only if federal state residence not missing
 # !is.na(bula_res)
-# Rows: 13.285
+# Rows: 13.517
 data <- data  %>%
   subset(!is.na(bula_res))
 
