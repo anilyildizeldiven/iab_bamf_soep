@@ -45,10 +45,17 @@ data <- data_clean
 # employment_three_year_arrival
 # employment_four_year_arrival
 # Output:
-# 1 - yes
-# 0 - no
+# 2 - yes
+# 1 - no
 
-# Nothing to modify
+# Change values 0 --> 1  and 1 --> 2
+data <- data %>%
+  mutate(across(c(employment_year_arrival,
+                  employment_one_year_arrival,
+                  employment_two_year_arrival,
+                  employment_three_year_arrival,
+                  employment_four_year_arrival), 
+                ~ ifelse(. == 0, 1, ifelse(. == 1, 2, .))))
 
 ## 03 - INDIVIDUAL-LEVEL CHARACTERISTICS ---------------------------------------
 
@@ -196,7 +203,7 @@ data <- data %>%
   select(c(
     "pid", "hid", "parid", "syear", "first_int", "last_int", "immiyear", "psample",
     "age", "age_immigration", "bula_res", "birth_year", "birth_month", "corigin",
-    "school_years", "sex", "refugee_sample", "free_case", "partner",
+    "school_years", "sex", "refugee_sample", "free_case", "partner", "same_state",
     "religious_affiliation", "german_speaking", "german_writing", "german_reading",
     "school_degree_low", "school_degree_med", "school_degree_high", "vocational_training",
     "employment_year", "employment_year_arrival", "employment_one_year_arrival", 
@@ -210,7 +217,7 @@ data <- data %>%
          first_int, last_int, immiyear, psample, 
          age, sex, birth_year, birth_month, free_case,
          partner, parid,
-         bula_res, age_immigration, employment_year, employment_year_arrival, employment_one_year_arrival, employment_two_year_arrival,
+         bula_res, same_state, age_immigration, employment_year, employment_year_arrival, employment_one_year_arrival, employment_two_year_arrival,
          employment_three_year_arrival, employment_four_year_arrival,
          everything())
 
@@ -241,8 +248,8 @@ data <- data[!(data$pid %in% implausible),]
 # Rows: 13.256
 # Ref: 8.677
 # Mig: 4.579
-data_final <- data
-save(data_final, file = paste0(path_data_final,"/data_final.RData"))
+data_soep <- data
+save(data_soep, file = paste0(path_data_final,"/data_soep.RData"))
 
 
 

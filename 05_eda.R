@@ -2,9 +2,9 @@
 # Input data set: 
 # data_final
 # Aim: EDA
-# 1. Number of missings per column
-# 2. Distributions 
-# 3. 
+# 1. Missings
+# 2. Distribution
+# 3. Relationships
 
 # Load packages ----------------------------------------------------------------
 library(dplyr)
@@ -27,11 +27,11 @@ path_data_final <- file.path(base_path, "soep_data", "final")
 
 # data_final
 # Rows: 13.256
-load(file.path(path_data_final, "data_final.RData"))
+load(file.path(path_data_final, "data_soep.RData"))
 
 # Rename data ------------------------------------------------------------------
 
-data <- data_final
+data <- data_soep
 
 # EDA --------------------------------------------------------------------------
 
@@ -159,61 +159,83 @@ print(xtable(latex_table_individual), include.rownames=FALSE)
 ### Employment 1 Year and Refugee Sample ---------------------------------------
 data_summary <- data %>%
   group_by(refugee_sample, employment_one_year_arrival) %>%
-  summarize(count = n(), .groups = 'drop')
+  summarize(count = n(), .groups = 'drop') %>% 
+  group_by(refugee_sample) %>%
+  mutate(proportion = count / sum(count))
 
 # Create the plot
-ggplot(data_summary, aes(x = factor(refugee_sample), y = count, fill = factor(employment_one_year_arrival))) +
+ggplot(data_summary, aes(x = factor(refugee_sample), y = proportion, fill = factor(employment_one_year_arrival))) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(x = "Refugee Sample", y = "Count", fill = "Employment 1 Year",
        title = "Distribution of Employment Status by Refugee Sample") +
-  scale_fill_manual(values = c("0" = "#66A182", "1" = "#2E4057")) +
+  scale_fill_manual(values = c("0" = "#2E4057", "1" = "#66A182")) +
   theme_minimal()
 
 
 ### Employment 1 Year and German Level -----------------------------------------
 data_summary <- data %>%
   group_by(german_writing, employment_one_year_arrival) %>%
-  summarize(count = n(), .groups = 'drop')
+  summarize(count = n(), .groups = 'drop') %>% 
+  group_by(german_writing) %>%
+  mutate(proportion = count / sum(count))
 
 # Create the plot
-ggplot(data_summary, aes(x = factor(german_writing), y = count, fill = factor(employment_one_year_arrival))) +
+ggplot(data_summary, aes(x = factor(german_writing), y = proportion, fill = factor(employment_one_year_arrival))) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(x = "Level", y = "Count", fill = "Employment 1 Year",
        title = "Distribution of Employment Status by German Level") +
-  scale_fill_manual(values = c("0" = "#66A182", "1" = "#2E4057")) +
+  scale_fill_manual(values = c("0" = "#2E4057", "1" = "#66A182")) +
   theme_minimal()
-
 
 
 ### Employment 1 Year and Federal State ----------------------------------------
 
 data_summary <- data %>%
   group_by(bula_res, employment_one_year_arrival) %>%
-  summarize(count = n(), .groups = 'drop')
+  summarize(count = n(), .groups = 'drop')  %>% 
+  group_by(bula_res) %>%
+  mutate(proportion = count / sum(count))
 
 # Create the plot
-ggplot(data_summary, aes(x = factor(bula_res), y = count, fill = factor(employment_one_year_arrival))) +
+ggplot(data_summary, aes(x = factor(bula_res), y = proportion, fill = factor(employment_one_year_arrival))) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(x = "Federal State", y = "Count", fill = "Employment 1 Year",
        title = "Distribution of Employment Status by Federal State") +
-  scale_fill_manual(values = c("0" = "#66A182", "1" = "#2E4057")) +
+  scale_fill_manual(values = c("0" = "#2E4057", "1" = "#66A182")) +
   theme_minimal()
 
 
 
-
-### Employment 1 Year and School Degree High -----------------------------------
+### Employment 1 Year and School Degree Low -----------------------------------
 
 data_summary <- data %>%
-  group_by(school_degree_high, employment_one_year_arrival) %>%
-  summarize(count = n(), .groups = 'drop')
+  group_by(school_degree_low, employment_one_year_arrival) %>%
+  summarize(count = n(), .groups = 'drop')  %>% 
+  group_by(school_degree_low) %>%
+  mutate(proportion = count / sum(count))
 
 # Create the plot
-ggplot(data_summary, aes(x = factor(school_degree_high), y = count, fill = factor(employment_one_year_arrival))) +
+ggplot(data_summary, aes(x = factor(school_degree_low), y = proportion, fill = factor(employment_one_year_arrival))) +
   geom_bar(stat = "identity", position = "dodge") +
-  labs(x = "School Degree High", y = "Count", fill = "Employment 1 Year",
-       title = "Distribution of Employment Status by School Degree High") +
-  scale_fill_manual(values = c("0" = "#66A182", "1" = "#2E4057")) +
+  labs(x = "School Degree Low", y = "Count", fill = "Employment 1 Year",
+       title = "Distribution of Employment Status by School Degree Low") +
+  scale_fill_manual(values = c("0" = "#2E4057", "1" = "#66A182")) +
+  theme_minimal()
+
+### Employment 1 Year and Vocational Training -----------------------------------
+
+data_summary <- data %>%
+  group_by(vocational_training, employment_one_year_arrival) %>%
+  summarize(count = n(), .groups = 'drop')  %>% 
+  group_by(vocational_training) %>%
+  mutate(proportion = count / sum(count))
+
+# Create the plot
+ggplot(data_summary, aes(x = factor(vocational_training), y = proportion, fill = factor(employment_one_year_arrival))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Vocational Training", y = "Count", fill = "Employment 1 Year",
+       title = "Distribution of Employment Status by Vocational Training") +
+  scale_fill_manual(values = c("0" = "#2E4057", "1" = "#66A182")) +
   theme_minimal()
 
 
@@ -221,14 +243,16 @@ ggplot(data_summary, aes(x = factor(school_degree_high), y = count, fill = facto
 
 data_summary <- data %>%
   group_by(sex, employment_one_year_arrival) %>%
-  summarize(count = n(), .groups = 'drop')
+  summarize(count = n(), .groups = 'drop')  %>% 
+  group_by(sex) %>%
+  mutate(proportion = count / sum(count))
 
 # Create the plot
-ggplot(data_summary, aes(x = factor(sex), y = count, fill = factor(employment_one_year_arrival))) +
+ggplot(data_summary, aes(x = factor(sex), y = proportion, fill = factor(employment_one_year_arrival))) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(x = "Sex", y = "Count", fill = "Employment 1 Year",
        title = "Distribution of Employment Status by Sex") +
-  scale_fill_manual(values = c("0" = "#66A182", "1" = "#2E4057")) +
+  scale_fill_manual(values = c("0" = "#2E4057", "1" = "#66A182")) +
   theme_minimal()
 
 
@@ -237,24 +261,58 @@ ggplot(data_summary, aes(x = factor(sex), y = count, fill = factor(employment_on
 
 data_summary <- data %>%
   group_by(free_case, employment_one_year_arrival) %>%
-  summarize(count = n(), .groups = 'drop')
+  summarize(count = n(), .groups = 'drop') %>% 
+  group_by(free_case) %>%
+  mutate(proportion = count / sum(count))
 
 # Create the plot
-ggplot(data_summary, aes(x = factor(free_case), y = count, fill = factor(employment_one_year_arrival))) +
+ggplot(data_summary, aes(x = factor(free_case), y = proportion, fill = factor(employment_one_year_arrival))) +
   geom_bar(stat = "identity", position = "dodge") +
   labs(x = "Free Case", y = "Count", fill = "Employment 1 Year",
        title = "Distribution of Employment Status by Free Case") +
-  scale_fill_manual(values = c("0" = "#66A182", "1" = "#2E4057")) +
+  scale_fill_manual(values = c("0" = "#2E4057", "1" = "#66A182")) +
   theme_minimal()
 
 
 
+### Employment 1 Year and Partner -----------------------------------
+
+data_summary <- data %>%
+  group_by(partner, employment_one_year_arrival) %>%
+  summarize(count = n(), .groups = 'drop') %>% 
+  group_by(partner) %>%
+  mutate(proportion = count / sum(count))
+
+# Create the plot
+ggplot(data_summary, aes(x = factor(partner), y = proportion, fill = factor(employment_one_year_arrival))) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(x = "Partner", y = "Count", fill = "Employment 1 Year",
+       title = "Distribution of Employment Status by Partner") +
+  scale_fill_manual(values = c("0" = "#2E4057", "1" = "#66A182")) +
+  theme_minimal()
 
 
 
+## Distributions between immigration years -------------------------------------
+
+data$refugee_sample <- as.factor(data$refugee_sample)
+ggplot(data, aes(x = immiyear, fill = refugee_sample)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Distribution of ref_sample by immiyear",
+       x = "Immigration Year",
+       y = "Count",
+       fill = "Reference Sample") +
+  theme_minimal()
 
 
-
+data$corigin <- as.factor(data$corigin)
+ggplot(data, aes(x = immiyear, fill = corigin)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Distribution of ref_sample by immiyear",
+       x = "Immigration Year",
+       y = "Count",
+       fill = "Reference Sample") +
+  theme_minimal()
 
 
 
